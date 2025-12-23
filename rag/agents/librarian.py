@@ -1,0 +1,24 @@
+# agents/librarian.py
+
+"""Librarian agent: Retrieves semantic blueprints."""
+import json
+
+class LibrarianAgent:
+    def __init__(self, pipeline):
+        self.pipeline = pipeline
+    
+    async def execute(self, mcp_message):
+        intent = mcp_message['content']['intent']
+        results = await self.pipeline.search(
+            query=intent,
+            namespace="ContextLibrary",
+            top_k=1
+        )
+        
+        if results:
+            blueprint_json = results[0].metadata.get('blueprint_json', '{}')
+            content = {'blueprint': blueprint_json}
+        else:
+            content = {'blueprint': json.dumps({'instruction': 'Generate neutral content'})}
+        
+        return {"sender": "Librarian", "content": content}
