@@ -1,15 +1,18 @@
 # implementation/azure_openai_embedder.py
 
 """
-Azure OpenAI embedding provider implementation.
+Azure OpenAI embedding provider implementation with token tracking and circuit breaker
 
 This module implements the EmbeddingProvider interface using Azure OpenAI's embeddings API.
 """
 
+
 import logging
-from typing import List
+from typing import List, Optional
 from openai import AsyncAzureOpenAI
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from ..abstractions.embedding_provider import EmbeddingProvider, EmbeddingMatrix
+from ..utils.token_utils import TokenTracker
 
 
 class AzureOpenAIEmbedder(EmbeddingProvider):
@@ -39,6 +42,7 @@ class AzureOpenAIEmbedder(EmbeddingProvider):
         api_version: str,
         deployment_name: str,
         timeout: float = 60.0,
+        token_tracker: Optional[TokenTracker] = None
     ):
         """
         Initialize the Azure OpenAI embedder.
@@ -49,9 +53,11 @@ class AzureOpenAIEmbedder(EmbeddingProvider):
             api_version: API version string (e.g., "2024-02-15-preview")
             deployment_name: Name of the deployed embedding model
             timeout: Timeout in seconds for API calls
+            token_tracker: Optional token tracker
         """
         self.deployment_name = deployment_name
-        
+        self.token_tracker = token_tracker
+
         # Create async Azure OpenAI client
         # This client handles connection pooling and retry logic internally
         self.client = AsyncAzureOpenAI(
@@ -61,7 +67,13 @@ class AzureOpenAIEmbedder(EmbeddingProvider):
             timeout=timeout,
         )
     
-    async def embed(self, texts: List[str]) -> EmbeddingMatrix:
+    
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception_type((Exception,)),
+    )
+    async def embed(self, texts: List[str], stage: str = "embedding") -> EmbeddingMatrix:
         """
         Generate embeddings using Azure OpenAI.
         
@@ -70,9 +82,10 @@ class AzureOpenAIEmbedder(EmbeddingProvider):
         
         Args:
             texts: List of strings to embed (max batch size depends on API limits)
-        
+            stage: Stage name for tracking
         Returns:
             List of embedding vectors (one per input text)
+        
         
         Raises:
             Exception: If API call fails (network error, rate limit, invalid input, etc.)
@@ -84,6 +97,11 @@ class AzureOpenAIEmbedder(EmbeddingProvider):
         if not texts:
             return []
         
+        
+        # Track tokens before embedding
+        if self.token_tracker:
+            self.token_tracker.add_embedding_usage(texts, stage=stage)
+
         try:
             # Call Azure OpenAI embeddings API
             # model parameter uses the deployment name (not the base model name)

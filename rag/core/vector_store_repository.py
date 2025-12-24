@@ -32,15 +32,25 @@ class VectorStoreRepository:
         retry=retry_if_exception_type((Exception,)),
     )
     async def upsert_documents(self, documents: List[Dict[str, Any]]) -> int:
-        """
+               """
+        Upload documents to Azure AI Search.
         Upload documents with retry protection.
         
+        Uses the upload_documents method which performs upsert operations:
+        - If document ID exists, it's updated
+        - If document ID is new, it's inserted
+        
         Args:
-            documents: List of document dicts
+            documents: List of document dictionaries matching the index schema
         
         Returns:
             Number of successfully uploaded documents
+        
+        Note:
+            Failed uploads are logged but don't raise exceptions.
+            Check the return value to detect partial failures.
         """
+
         if not documents:
             return 0
         
@@ -78,16 +88,25 @@ class VectorStoreRepository:
     ) -> List[Dict[str, Any]]:
         """
         Perform vector search with retry protection.
+        Perform vector similarity search.
+        
+        Uses Azure AI Search's vector search with HNSW indexing for fast
+        approximate nearest neighbor search. Results are ranked by cosine similarity.
         
         Args:
-            query_vector: Embedding vector
-            top_k: Number of results
-            filter_expr: OData filter
-            select_fields: Fields to return
+            query_vector: The embedding vector to search for
+            top_k: Maximum number of results to return
+            filter_expr: Optional OData filter (e.g., "namespace eq 'KnowledgeBase'")
+            select_fields: Optional list of fields to return (default: all standard fields)
         
         Returns:
-            List of matching documents
+            List of matching documents with @search.score field indicating relevance
+        
+        Note:
+            The @search.score field contains the similarity score (higher = more relevant).
+            Scores depend on the vector search algorithm and normalization settings.
         """
+
         try:
             vector_query = VectorizedQuery(
                 vector=query_vector,
@@ -120,7 +139,13 @@ class VectorStoreRepository:
         retry=retry_if_exception_type((Exception,)),
     )
     async def get_document_count(self) -> int:
-        """Get total document count with retry."""
+        """
+        Get the total number of documents in the index.
+        
+        Returns:
+            Total document count, or 0 if the query fails
+        """
+
         try:
             return await self.client.get_document_count()
         except Exception as e:
@@ -128,7 +153,12 @@ class VectorStoreRepository:
             return 0
     
     async def close(self):
-        """Close client connection."""
+                """
+        Close the Azure client connection.
+        
+        Safe to call multiple times.
+        """
+
         try:
             await self.client.close()
         except Exception as e:
