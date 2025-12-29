@@ -80,7 +80,19 @@ class AzureOpenAILLM(LLMProvider):
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=2, max=10),
-        retry=retry_if_exception_type((APIConnectionError, RateLimitError, APIStatusError)),
+        retry=retry_if_exception_type(Exception),
+    )
+    async def safe_generate(self, messages, temperature=0.7, max_tokens=None):
+        return await self.client.chat.completions.create(
+            model=self.deployment_name,
+             messages=messages,
+            temperature=temperature,
+        )
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception_type(Exception),
     )
     async def generate(
         self,

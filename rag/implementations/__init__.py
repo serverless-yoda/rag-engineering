@@ -11,9 +11,10 @@ using Azure SDKs (Azure OpenAI and Azure AI Search).
 from .azure_openai_embedder import AzureOpenAIEmbedder
 from .azure_search_store import AzureSearchStore
 from .azure_openai_llm import AzureOpenAILLM
-
+from .azure_content_safety import AzureContentSafety
 __all__ = [
     "AzureOpenAIEmbedder",
     "AzureSearchStore",
     "AzureOpenAILLM",
+    "AzureContentSafety"
 ]

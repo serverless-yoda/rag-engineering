@@ -32,7 +32,7 @@ class VectorStoreRepository:
         retry=retry_if_exception_type((Exception,)),
     )
     async def upsert_documents(self, documents: List[Dict[str, Any]]) -> int:
-               """
+        """
         Upload documents to Azure AI Search.
         Upload documents with retry protection.
         
@@ -153,7 +153,7 @@ class VectorStoreRepository:
             return 0
     
     async def close(self):
-                """
+        """
         Close the Azure client connection.
         
         Safe to call multiple times.

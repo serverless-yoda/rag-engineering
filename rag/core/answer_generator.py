@@ -92,7 +92,7 @@ class AnswerGenerator:
 
         try:
             # Send messages to LLMProvider and return response
-            answer = await self.llm.generate(
+            answer = await self.llm.safe_generate(
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,

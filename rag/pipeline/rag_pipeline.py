@@ -12,115 +12,89 @@ This module coordinates the four core stages of the RAG system:
 It provides high-level workflows and direct access to each stage.
 """
 
+
 import logging
 from typing import List, Union, Dict, Any, Optional
-from ..models import RAGConfig, IngestionResult, SearchResult, ChunkingConfig
-from ..implementations import AzureOpenAIEmbedder, AzureSearchStore, AzureOpenAILLM
-from ..core import IndexManager, DocumentIngester, SemanticSearcher, AnswerGenerator
-from ..engine.context_engine import ContextEngine
-
+from ..models import RAGConfig, IngestionResult, SearchResult
+from ..utils import TokenTracker
 
 class RAGPipeline:
     """
-    Main orchestrator for the RAG system.
-
-    Responsibilities:
-    - Initialize all providers and modules
-    - Provide high-level workflows (setup, answer_question, generate_with_context)
-    - Expose direct access to each stage for advanced use
+    Main orchestrator for RAG system with DI.
     """
-
-    def __init__(self, config: RAGConfig):
+    
+    def __init__(
+        self,
+        config: RAGConfig,
+        embedder,
+        llm,
+        store,
+        index_manager,
+        ingester,
+        searcher,
+        generator,
+        token_tracker: TokenTracker,
+        content_safety=None,
+    ):
+        """
+        Initialize pipeline with injected dependencies.
+        
+        Args:
+            config: RAG configuration
+            embedder: Embedding provider
+            llm: LLM provider
+            store: Vector store provider
+            index_manager: Index manager
+            ingester: Document ingester
+            searcher: Semantic searcher
+            generator: Answer generator
+            token_tracker: Token usage tracker
+            content_safety: Optional content safety
+        """
         self.config = config
-
-        # Providers
-        self.embedder = AzureOpenAIEmbedder(
-            endpoint=config.azure_openai_endpoint,
-            api_key=config.azure_openai_api_key,
-            api_version=config.azure_openai_api_version,
-            deployment_name=config.embedding_deployment,
-        )
-        self.store = AzureSearchStore(
-            endpoint=config.azure_search_endpoint,
-            api_key=config.azure_search_api_key,
-            index_name=config.index_name,
-        )
-        self.llm = AzureOpenAILLM(
-            endpoint=config.azure_openai_endpoint,
-            api_key=config.azure_openai_api_key,
-            api_version=config.azure_openai_api_version,
-            deployment_name=config.model_deployment,
-            timeout=config.llm_timeout,
-            retries=config.llm_retries,
-        )
-
-        # Core B.I.S.A. modules
-        self.index_manager = IndexManager(
-            endpoint=config.azure_search_endpoint,
-            api_key=config.azure_search_api_key,
-            index_name=config.index_name,
-            vector_dimensions=config.vector_dimensions,
-        )
-        self.ingester = DocumentIngester(
-            embedder=self.embedder,
-            store=self.store,
-            index_manager=self.index_manager,
-            batch_size=config.batch_size,
-        )
-        self.searcher = SemanticSearcher(
-            embedder=self.embedder,
-            store=self.store,
-            index_manager=self.index_manager,
-        )
-        self.generator = AnswerGenerator(llm=self.llm)
-
-        # Multi-agent context engine
-        self.context_engine = ContextEngine(self)
-
+        self.embedder = embedder
+        self.llm = llm
+        self.store = store
+        self.index_manager = index_manager
+        self.ingester = ingester
+        self.searcher = searcher
+        self.generator = generator
+        self.token_tracker = token_tracker
+        self.content_safety = content_safety
+        
+        # Initialize context engine
+        from ..engine.context_engine import ContextEngine
+        self.context_engine = ContextEngine(self, content_safety)
+    
     async def __aenter__(self) -> "RAGPipeline":
         return self
-
+    
     async def __aexit__(self, exc_type, exc, tb) -> None:
         await self.close()
-
+    
     async def close(self) -> None:
-        """Clean up all resources."""
+        """Clean up resources."""
         for client in [self.embedder, self.store, self.llm, self.index_manager]:
             try:
                 await client.close()
             except Exception:
                 pass
-
+    
     # === High-Level Workflows ===
-
+    
     async def setup(
         self,
         documents: List[Union[str, Dict[str, Any]]],
         namespace: Optional[str] = None,
     ) -> IngestionResult:
-        """BUILD + INGEST: Setup index and ingest documents."""
+        """BUILD + INGEST workflow."""
         await self.index_manager.create_index()
         return await self.ingester.ingest_documents(
             items=documents,
             namespace=namespace or self.config.default_namespace,
             chunking_config=self.config.chunking,
         )
-
-    async def ingest_blueprints(
-        self,
-        blueprints: List[Dict[str, Any]],
-        *,
-        namespace: Optional[str] = None,
-        extra_meta: Optional[Dict[str, Any]] = None,
-    ) -> IngestionResult:
-        """INGEST: Upload blueprint descriptions (no chunking)."""
-        await self.index_manager.create_index()
-        return await self.ingester.ingest_blueprints(
-            blueprints=blueprints,
-            namespace=namespace or self.config.default_namespace,
-            extra_meta=extra_meta,
-        )
-
+    
     async def answer_question(
         self,
         question: str,
@@ -129,52 +103,209 @@ class RAGPipeline:
         top_k: int = 5,
         system_prompt: Optional[str] = None,
     ) -> str:
-        """SEARCH + ANSWER: End-to-end Q&A workflow."""
+        """SEARCH + ANSWER workflow."""
         results = await self.searcher.search(
             query=question,
             namespace=namespace,
             top_k=top_k,
         )
+        
         if not results:
-            return "I couldn't find any relevant information to answer your question."
-
+            return "I couldn't find relevant information."
+        
         context = "\n\n".join(
             f"[Source: {r.source_id}]\n{r.chunk}" for r in results
         )
-        return await self.generator.generate(
+        
+        answer = await self.generator.generate(
             question=question,
             context=context,
             system_prompt=system_prompt,
         )
-
+        
+        # Log token usage
+        logging.info(self.token_tracker.report())
+        
+        return answer
+    
     async def generate_with_context(self, goal: str) -> str:
-        """
-        MULTI-AGENT: Execute a contextual generation workflow.
-
-        Args:
-            goal: High-level user goal (e.g., "Write a suspenseful story")
-
-        Returns:
-            Final generated content
-        """
-        return await self.context_engine.execute(goal)
-
+        """Multi-agent workflow."""
+        result = await self.context_engine.execute(goal)
+        
+        # Log token usage
+        logging.info(self.token_tracker.report())
+        
+        return result
+    
     # === Direct Access ===
-
+    
     async def ingest(
         self,
         documents: List[Union[str, Dict[str, Any]]],
         **kwargs,
     ) -> IngestionResult:
         return await self.ingester.ingest_documents(documents, **kwargs)
-
+    
     async def search(
         self,
         query: str,
         **kwargs,
     ) -> List[SearchResult]:
         return await self.searcher.search(query, **kwargs)
+    
+    async def generate(
+        self,
+        question: str,
+        context: str,
+        **kwargs,
+    ) -> str:
+        return await self.generator.generate(question, context, **kwargs)
 
+
+"""
+RAG Pipeline orchestrator with dependency injection.
+"""
+
+import logging
+from typing import List, Union, Dict, Any, Optional
+from ..models import RAGConfig, IngestionResult, SearchResult
+from ..utils.token_utils import TokenTracker
+
+class RAGPipeline:
+    """
+    Main orchestrator for RAG system with DI.
+    """
+    
+    def __init__(
+        self,
+        config: RAGConfig,
+        embedder,
+        llm,
+        store,
+        index_manager,
+        ingester,
+        searcher,
+        generator,
+        token_tracker: TokenTracker,
+        content_safety=None,
+    ):
+        """
+        Initialize pipeline with injected dependencies.
+        
+        Args:
+            config: RAG configuration
+            embedder: Embedding provider
+            llm: LLM provider
+            store: Vector store provider
+            index_manager: Index manager
+            ingester: Document ingester
+            searcher: Semantic searcher
+            generator: Answer generator
+            token_tracker: Token usage tracker
+            content_safety: Optional content safety
+        """
+        self.config = config
+        self.embedder = embedder
+        self.llm = llm
+        self.store = store
+        self.index_manager = index_manager
+        self.ingester = ingester
+        self.searcher = searcher
+        self.generator = generator
+        self.token_tracker = token_tracker
+        self.content_safety = content_safety
+        
+        # Initialize context engine
+        from ..engine.context_engine import ContextEngine
+        self.context_engine = ContextEngine(self, content_safety)
+    
+    async def __aenter__(self) -> "RAGPipeline":
+        return self
+    
+    async def __aexit__(self, exc_type, exc, tb) -> None:
+        await self.close()
+    
+    async def close(self) -> None:
+        """Clean up resources."""
+        for client in [self.embedder, self.store, self.llm, self.index_manager]:
+            try:
+                await client.close()
+            except Exception:
+                pass
+    
+    # === High-Level Workflows ===
+    
+    async def setup(
+        self,
+        documents: List[Union[str, Dict[str, Any]]],
+        namespace: Optional[str] = None,
+    ) -> IngestionResult:
+        """BUILD + INGEST workflow."""
+        await self.index_manager.create_index()
+        return await self.ingester.ingest_documents(
+            items=documents,
+            namespace=namespace or self.config.default_namespace,
+            chunking_config=self.config.chunking,
+        )
+    
+    async def answer_question(
+        self,
+        question: str,
+        *,
+        namespace: Optional[str] = None,
+        top_k: int = 5,
+        system_prompt: Optional[str] = None,
+    ) -> str:
+        """SEARCH + ANSWER workflow."""
+        results = await self.searcher.search(
+            query=question,
+            namespace=namespace,
+            top_k=top_k,
+        )
+        
+        if not results:
+            return "I couldn't find relevant information."
+        
+        context = "\n\n".join(
+            f"[Source: {r.source_id}]\n{r.chunk}" for r in results
+        )
+        
+        answer = await self.generator.generate(
+            question=question,
+            context=context,
+            system_prompt=system_prompt,
+        )
+        
+        # Log token usage
+        logging.info(self.token_tracker.report())
+        
+        return answer
+    
+    async def generate_with_context(self, goal: str) -> str:
+        """Multi-agent workflow."""
+        result = await self.context_engine.execute(goal)
+        
+        # Log token usage
+        logging.info(self.token_tracker.report())
+        
+        return result
+    
+    # === Direct Access ===
+    
+    async def ingest(
+        self,
+        documents: List[Union[str, Dict[str, Any]]],
+        **kwargs,
+    ) -> IngestionResult:
+        return await self.ingester.ingest_documents(documents, **kwargs)
+    
+    async def search(
+        self,
+        query: str,
+        **kwargs,
+    ) -> List[SearchResult]:
+        return await self.searcher.search(query, **kwargs)
+    
     async def generate(
         self,
         question: str,

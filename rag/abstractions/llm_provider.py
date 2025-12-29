@@ -62,6 +62,15 @@ class LLMProvider(ABC):
         pass
     
     @abstractmethod
+    async def safe_generate(
+        self,
+        messages: List[Dict[str, str]],
+        temperature: float = 0.7,
+        max_tokens: Optional[int] = None,
+    ) -> str:
+        pass
+
+    @abstractmethod
     async def close(self) -> None:
         """
         Cleanup resources (close connections, etc.).
