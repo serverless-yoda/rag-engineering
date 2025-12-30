@@ -9,7 +9,7 @@ for Azure OpenAI, Azure AI Search, and pipeline behavior.
 
 from dataclasses import dataclass, field
 from .types import ChunkingConfig
-
+from types import Optional
 
 @dataclass
 class RAGConfig:
@@ -64,3 +64,11 @@ class RAGConfig:
     default_namespace: str = "KnowledgeStore"
     batch_size: int = 16
     chunking: ChunkingConfig = field(default_factory=ChunkingConfig)
+
+    
+    # Content Safety (optional)
+    content_safety_endpoint: Optional[str] = None
+    content_safety_api_key: Optional[str] = None
+    content_moderation_enabled: bool = True
+    content_moderation_threshold: int = 2
+

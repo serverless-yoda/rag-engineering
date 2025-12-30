@@ -68,6 +68,36 @@ class Settings(BaseSettings):
 
     start_with_clean_index: Annotated[bool, Field(default=True, description="Start from empty index")]
 
+    
+
+    # Azure Content Safety
+    content_safety_endpoint: Annotated[
+        Optional[HttpUrl],
+        Field(
+            default=None,
+            alias="azure_content_safety_endpoint",
+            description="Azure Content Safety endpoint"
+        ),
+    ]
+
+    content_safety_api_key: Annotated[
+        Optional[str],
+        Field(
+            default=None,
+            description="Azure Content Safety API key"
+        ),
+    ]
+
+    content_moderation_enabled: Annotated[
+        bool,
+        Field(default=True, description="Enable content moderation")
+    ]
+
+    content_moderation_threshold: Annotated[
+        int,
+        Field(default=2, ge=0, le=6, description="Content severity threshold (0-6)")
+    ]
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
