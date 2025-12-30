@@ -9,12 +9,14 @@ This agent uses the LLM to produce structured output based on:
 - previous_content: optional existing content to rewrite
 """
 
+import logging
 class WriterAgent:
-    def __init__(self, pipeline):
+    def __init__(self, pipeline, content_safety=None):
         """
         Initialize with access to the RAGPipeline.
         """
         self.pipeline = pipeline
+        self.content_safety = content_safety
 
     async def execute(self, mcp_message):
         """
@@ -82,4 +84,21 @@ Generate the content now.
 """
         
         final_output = await self.pipeline.generate(question=user_prompt, context="", system_prompt=system_prompt)
+        # Content safety check
+        
+        moderation_result = await self.content_safety.moderate_text(final_output)
+        if not moderation_result["is_safe"]:
+            logging.warning(f"Writer output blocked: {moderation_result['recommendation']}")
+            return {
+                    "sender": "Writer",
+                    "content": {
+                        "output": "⚠️ Content blocked by safety filters",
+                        "moderation_result": moderation_result,
+                        "status": "blocked",
+                    }
+                }
+            
+            logging.info(f"✅ Content moderation passed. Scores: {moderation_result['severity_scores']}")
+
+
         return {"sender": "Writer", "content": {'output': final_output}}

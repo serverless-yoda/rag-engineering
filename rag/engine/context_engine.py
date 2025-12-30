@@ -31,6 +31,13 @@ class ContextEngine:
             logging.info(f"Executed Step {step['step']} with agent {step['agent']}")
             logging.info(f"Input: {mcp_input}")
             logging.info(f"Output: {mcp_output}")
+
+            
+            # Check if step was blocked
+            if isinstance(mcp_output['content'], dict) and mcp_output['content'].get('status') == 'blocked':
+                logging.warning(f"⚠️ Workflow blocked at step {step['step']}")
+                return mcp_output['content']
+
         
         return state[f"STEP_{len(plan)}_OUTPUT"]
     
