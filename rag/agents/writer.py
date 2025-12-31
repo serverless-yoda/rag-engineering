@@ -10,7 +10,8 @@ This agent uses the LLM to produce structured output based on:
 """
 
 import logging
-class WriterAgent:
+from ..agents.base_agents import BaseAgent
+class WriterAgent(BaseAgent):
     def __init__(self, pipeline, content_safety=None):
         """
         Initialize with access to the RAGPipeline.
@@ -28,17 +29,13 @@ class WriterAgent:
         Returns:
             Dict with generated 'output' as content.
         """
-        #print("WriterAgent received message:", mcp_message)
+        self.validate_input(mcp_message['content'], ['blueprint','facts','previous_content'])
         content = mcp_message['content']
         blueprint_json = content.get('blueprint', '{}')
-        #print(f"Blueprint JSON: {blueprint_json}")
         facts = content.get('facts', '')
-        #print(f"\nFacts: {facts}")
         previous = content.get('previous_content', '')
-        #print(f"\nPrevious Content: {previous}")
         blueprint_json_string = blueprint_json.get('blueprint', '{}') if isinstance(blueprint_json, dict) else blueprint_json
-        #print(f"\nUsing Blueprint: {blueprint_json_string}")
-
+        
         facts_data = None
         if isinstance(facts, dict):
             facts_data = facts.get('facts', '')  # Handle case where facts come from Summarizer
@@ -49,7 +46,7 @@ class WriterAgent:
         elif isinstance(facts, str):
             facts_data = facts
         
-        print(f"\nFacts data: {facts_data}")
+        #print(f"\nFacts data: {facts_data}")
 
         if not blueprint_json_string or (not facts_data and not previous):
             return {"sender": "Writer", "content": {'output': 'Error: Missing blueprint or facts or previous for content generation.'}}

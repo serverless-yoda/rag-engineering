@@ -9,8 +9,9 @@ and uses the LLM to summarize the retrieved chunks into concise facts.
 
 import json
 from ..utils import sanitize_input
+from ..agents.base_agents import BaseAgent
 
-class ResearcherAgent:
+class ResearcherAgent(BaseAgent)
     def __init__(self, pipeline):
         """
         Initialize with access to the RAGPipeline.
@@ -27,6 +28,7 @@ class ResearcherAgent:
         Returns:
             Dict with synthesized 'facts' as content.
         """
+        self.validate_input(mcp_message['content'], ['topic'])
         topic = mcp_message['content']['topic']
         results = await self.pipeline.search(
             query=topic,

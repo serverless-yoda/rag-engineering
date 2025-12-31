@@ -15,3 +15,11 @@ class BaseAgent(ABC):
     async def execute(self, mcp_message: Dict[str, Any]) -> Dict[str, Any]:
         """Execute agent logic and return MCP message."""
         pass
+
+    def validate_input(self, content: Dict[str, Any], required_keys: list) -> bool:
+        """Validate that required keys are present in the content."""
+        for field in required_keys:
+            if field not in content:
+                raise ValueError(f"Missing required field: {field}")
+            
+        

@@ -2,12 +2,15 @@
 
 """Librarian agent: Retrieves semantic blueprints."""
 import json
+from ..agents.base_agents import BaseAgent
 
-class LibrarianAgent:
+class LibrarianAgent(BaseAgent):
     def __init__(self, pipeline):
         self.pipeline = pipeline
     
     async def execute(self, mcp_message):
+        self.validate_input(mcp_message['content'], ['intent'])
+        
         intent = mcp_message['content']['intent']
         results = await self.pipeline.search(
             query=intent,
