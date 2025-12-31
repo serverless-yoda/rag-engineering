@@ -9,7 +9,7 @@ for Azure OpenAI, Azure AI Search, and pipeline behavior.
 
 from dataclasses import dataclass, field
 from .types import ChunkingConfig
-from types import Optional
+from typing import Optional
 
 @dataclass
 class RAGConfig:

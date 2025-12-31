@@ -14,7 +14,7 @@ from openai import AsyncAzureOpenAI
     
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from ..abstractions.llm_provider import LLMProvider
-from ..utils.token_utils import TokenTracker
+from ..utils import TokenTracker
 
 class AzureOpenAILLM(LLMProvider):
     """
@@ -85,8 +85,8 @@ class AzureOpenAILLM(LLMProvider):
     async def safe_generate(self, messages, temperature=0.7, max_tokens=None):
         return await self.client.chat.completions.create(
             model=self.deployment_name,
-             messages=messages,
-            temperature=temperature,
+            messages=messages,
+            #temperature=temperature,
         )
 
     @retry(
@@ -125,8 +125,8 @@ class AzureOpenAILLM(LLMProvider):
                 self.client.chat.completions.create(
                     model=self.deployment_name,
                     messages=messages,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
+                    #temperature=temperature,
+                    #max_tokens=max_tokens,
                 ),
                 timeout=self.timeout,
             )

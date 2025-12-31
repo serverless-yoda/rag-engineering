@@ -8,10 +8,10 @@ import logging
 import warnings
 import sys
 
-from models import env_settings
-from models.config import RAGConfig, ChunkingConfig
-from di.container import Container
-from utils import list_files_in_folder
+from .models import env_settings
+from .models.config import RAGConfig, ChunkingConfig
+from .di.container import Container
+from .utils import list_files_in_folder
 from blueprints.knowledge.store import knowledge_data_raw
 from blueprints.context.instruction import context_blueprints
 
@@ -64,30 +64,30 @@ async def main():
     async with pipeline:
         if env_settings.start_with_clean_index:
             logging.info("🗑️  Deleting existing index...")
-            await pipeline.index_manager.delete_index()
+            # #await pipeline.index_manager.delete_index()
             
-            logging.info("📚 Uploading blueprints...")
-            result = await pipeline.ingester.ingest_blueprints(
-                blueprints,
-                namespace=env_settings.rag_namespace_blueprint_context
-            )
-            logging.info(f"✅ Blueprints: {result}")
+            # logging.info("📚 Uploading blueprints...")
+            # result = await pipeline.ingester.ingest_blueprints(
+            #     blueprints,
+            #     namespace=env_settings.rag_namespace_blueprint_context
+            # )
+            # logging.info(f"✅ Blueprints: {result}")
             
-            logging.info("📄 Uploading documents...")
-            result = await pipeline.setup(
-                documents,
-                namespace=env_settings.rag_namespace_knowledge_store
-            )
-            logging.info(f"✅ Documents: {result}")
+            # logging.info("📄 Uploading documents...")
+            # result = await pipeline.setup(
+            #     documents,
+            #     namespace=env_settings.rag_namespace_knowledge_store
+            # )
+            # logging.info(f"✅ Documents: {result}")
         
         # SEARCH + ANSWER
-        question = "What happened in WW2?"
+        question = "What's the caused of  in WW1?"
         print(f"\n🔍 Question: {question}")
         answer = await pipeline.answer_question(question, top_k=3)
         print(f"💬 Answer: {answer}")
         
         # Token usage
-        print(pipeline.token_tracker.report())
+        #print(pipeline.token_tracker.report())
         
         # MULTI-AGENT WORKFLOW
         goal = """Write a short technical summary about World War 2."""
@@ -96,7 +96,7 @@ async def main():
         print(f"\n🎬 Final Output:\n{output}")
         
         # Final token report
-        print(pipeline.token_tracker.report())
+        #print(pipeline.token_tracker.report())
 
 def run_main():
     if sys.platform == "win32":

@@ -1,6 +1,6 @@
 # models/env.py
 
-from typing import Annotated
+from typing import Annotated, Optional
 
 from pydantic import Field, HttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -75,16 +75,17 @@ class Settings(BaseSettings):
         Optional[HttpUrl],
         Field(
             default=None,
-            alias="azure_content_safety_endpoint",
+            alias="content_safety_endpoint",
             description="Azure Content Safety endpoint"
         ),
     ]
 
     content_safety_api_key: Annotated[
-        Optional[str],
+        str,
         Field(
-            default=None,
-            description="Azure Content Safety API key"
+            min_length=5,
+            alias="content_safety_api_key",  # keep backward-compatible alias
+            description="Azure Content Safety API key",
         ),
     ]
 

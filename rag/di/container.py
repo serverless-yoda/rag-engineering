@@ -5,19 +5,21 @@ Dependency injection container using dependency-injector.
 
 from dependency_injector import containers, providers
 from ..models import RAGConfig
-from implementations import (
+from ..implementations import (
     AzureOpenAIEmbedder,
     AzureOpenAILLM,
     AzureSearchStore,
+    AzureContentSafety
 )
-from ..implementations import AzureContentSafety
-from core import (
+
+from ..core import (
     IndexManager,
     DocumentIngester,
     SemanticSearcher,
     AnswerGenerator,
 )
 from ..utils import TokenTracker
+from ..pipeline.rag_pipeline import RAGPipeline
 
 class Container(containers.DeclarativeContainer):
     """Main DI container for the RAG pipeline."""
@@ -96,4 +98,18 @@ class Container(containers.DeclarativeContainer):
     generator = providers.Factory(
         AnswerGenerator,
         llm=llm,
+    )
+
+    rag_pipeline = providers.Factory(
+        RAGPipeline,
+        config=config,
+        embedder=embedder,
+        llm=llm,
+        store=store,
+        index_manager=index_manager,
+        ingester=ingester,
+        searcher=searcher,
+        generator=generator,
+        token_tracker=token_tracker,
+        content_safety=content_safety,
     )

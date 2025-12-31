@@ -92,12 +92,13 @@ class AnswerGenerator:
 
         try:
             # Send messages to LLMProvider and return response
-            answer = await self.llm.safe_generate(
+            answer = await self.llm.generate(
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,
             )
-            logging.info("Answer generated successfully.")
+            logging.info(f"Answer generated successfully.{answer}")
+            
             return answer
         except Exception as e:
             logging.error(f"Answer generation failed: {e}")

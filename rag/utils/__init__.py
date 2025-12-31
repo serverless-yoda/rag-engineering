@@ -15,7 +15,7 @@ from .document_utils import make_search_documents, normalize_items, list_files_i
 from .tokens_utils import count_tokens
 from .normalize_utils import normalize_file_items
 from .generictext_utils import file_to_text_content
-from .tokens_utils import TokenTracker
+from .tokens_utils import TokenTracker, TokenUsage
 __all__ = [
     "to_text_content",
     "strip_html",
@@ -32,5 +32,6 @@ __all__ = [
     "file_to_text_content",
     "list_files_in_folder",
     "make_item_source_id",
-    "TokenTracker"
+    "TokenTracker",
+    "TokenUsage",
 ]

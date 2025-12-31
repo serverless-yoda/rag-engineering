@@ -12,7 +12,7 @@ from typing import List, Optional
 from openai import AsyncAzureOpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from ..abstractions.embedding_provider import EmbeddingProvider, EmbeddingMatrix
-from ..utils.token_utils import TokenTracker
+from ..utils import TokenTracker
 
 
 class AzureOpenAIEmbedder(EmbeddingProvider):

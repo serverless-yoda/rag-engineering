@@ -7,10 +7,11 @@ from ..agents.registry import AgentRegistry
 from ..agents.planner import PlannerAgent
 
 class ContextEngine:
-    def __init__(self, pipeline):
+    def __init__(self, pipeline, content_safety=None):
         self.pipeline = pipeline
         self.registry = AgentRegistry(pipeline)
         self.planner = PlannerAgent(pipeline)
+        self.content_safety = content_safety
     
     async def execute(self, goal: str):
         # Phase 1: Plan
