@@ -5,14 +5,14 @@ import json
 from ..agents.base_agents import BaseAgent
 
 class LibrarianAgent(BaseAgent):
-    def __init__(self, pipeline):
-        self.pipeline = pipeline
+    def __init__(self, searcher):
+        self.searcher = searcher
     
     async def execute(self, mcp_message):
         self.validate_input(mcp_message['content'], ['intent'])
-        
+
         intent = mcp_message['content']['intent']
-        results = await self.pipeline.search(
+        results = await self.searcher.search(
             query=intent,
             namespace="ContextLibrary",
             top_k=1

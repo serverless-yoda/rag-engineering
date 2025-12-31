@@ -9,14 +9,13 @@ This agent uses the LLM to produce structured output based on:
 - previous_content: optional existing content to rewrite
 """
 
-import logging
 from ..agents.base_agents import BaseAgent
 class WriterAgent(BaseAgent):
-    def __init__(self, pipeline, content_safety=None):
+    def __init__(self, generator, content_safety=None):
         """
         Initialize with access to the RAGPipeline.
         """
-        self.pipeline = pipeline
+        self.generator = generator
         self.content_safety = content_safety
 
     async def execute(self, mcp_message):
@@ -46,8 +45,6 @@ class WriterAgent(BaseAgent):
         elif isinstance(facts, str):
             facts_data = facts
         
-        #print(f"\nFacts data: {facts_data}")
-
         if not blueprint_json_string or (not facts_data and not previous):
             return {"sender": "Writer", "content": {'output': 'Error: Missing blueprint or facts or previous for content generation.'}}
 
@@ -80,7 +77,7 @@ Adhere strictly to the blueprint's instructions, style guides, and goals. The bl
 Generate the content now.
 """
         
-        final_output = await self.pipeline.generate(question=user_prompt, context="", system_prompt=system_prompt)
+        final_output = await self.generator.generate(question=user_prompt, context="", system_prompt=system_prompt)
         
         # Content safety check      
         # Commenting this: its failing because of self.content_safety is None in some tests

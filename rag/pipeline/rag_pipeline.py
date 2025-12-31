@@ -63,7 +63,9 @@ class RAGPipeline:
         self.token_tracker = token_tracker
         self.content_safety = content_safety
         
-        self.context_engine = ContextEngine(self, content_safety)
+        self.context_engine = ContextEngine(searcher=self.searcher
+                                            ,generator=self.generator
+                                            ,content_safety=content_safety)
     
     async def __aenter__(self) -> "RAGPipeline":
         return self

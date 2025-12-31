@@ -12,13 +12,13 @@ This agent uses the LLM to:
 from ..agents.base_agents import BaseAgent
 
 class SummarizerAgent(BaseAgent):
-    def __init__(self, pipeline):
+    def __init__(self, generator):
         """
         Initialize the SummarizerAgent with access to the RAGPipeline.
 
         The pipeline provides access to the LLM and other shared services.
         """
-        self.pipeline = pipeline
+        self.generator = generator
 
     async def execute(self, mcp_message):
         """
@@ -37,13 +37,10 @@ class SummarizerAgent(BaseAgent):
         """
         try:
             self.validate_input(mcp_message['content'], ['text_to_summarize', 'summary_objective'])
-            #print("SummarizerAgent received message:", mcp_message)
-            # Extract required fields from the input message
+            
             text_to_summarize = mcp_message['content'].get('text_to_summarize', "")
             summary_objective = mcp_message['content'].get('summary_objective', "")
-            #print(f"Text to summarize : {text_to_summarize}...")
-            #print(f"Summary objective: {summary_objective}")
-
+            
             # Validate input presence
             #if not text_to_summarize or not summary_objective:
             #    raise ValueError("Both 'text_to_summarize' and 'summary_objective' must be provided..")
@@ -62,7 +59,7 @@ class SummarizerAgent(BaseAgent):
             )
 
             # Call the LLM via the pipeline's generate method
-            final_output = await self.pipeline.generate(
+            final_output = await self.generator.generate(
                 question=user_prompt,
                 context="",
                 system_prompt=system_prompt

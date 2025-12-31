@@ -20,7 +20,7 @@ class AgentRegistry:
     - ContextEngine to resolve agent handlers
     - PlannerAgent to understand available agents
     """
-    def __init__(self, pipeline, content_safety=None):
+    def __init__(self, searcher, generator, content_safety=None):
         """
         Initialize the registry with access to the pipeline.
 
@@ -28,10 +28,10 @@ class AgentRegistry:
             pipeline: RAGPipeline instance (used by agents)
         """
         self.registry = {
-            "librarian": LibrarianAgent(pipeline),
-            "researcher": ResearcherAgent(pipeline),
-            "writer": WriterAgent(pipeline, content_safety=content_safety),
-            "summarizer": SummarizerAgent(pipeline),
+            "librarian": LibrarianAgent(searcher),
+            "researcher": ResearcherAgent(searcher, generator),
+            "writer": WriterAgent(generator, content_safety=content_safety),
+            "summarizer": SummarizerAgent(generator),
         }
 
     def get(self, agent_name: str):
