@@ -7,6 +7,7 @@ Exports all configuration objects and result types used throughout the B.I.S.A. 
 """
 from .env import env_settings
 from .config import RAGConfig
+from .agent_response import AgentResponse
 
 from .types import (
     ChunkingConfig,
@@ -21,4 +22,5 @@ __all__ = [
     "JsonDict",
     "RAGConfig",
     "env_settings",
+    "AgentResponse",
 ]

@@ -81,10 +81,10 @@ async def main():
             # logging.info(f"✅ Documents: {result}")
         
         # SEARCH + ANSWER
-        question = "What's the caused of  in WW1?"
-        print(f"\n🔍 Question: {question}")
-        answer = await pipeline.answer_question(question, top_k=3)
-        print(f"💬 Answer: {answer}")
+        #question = "What's the caused of  in WW1?"
+        #print(f"\n🔍 Question: {question}")
+        #answer = await pipeline.answer_question(question, top_k=3)
+        #print(f"💬 Answer: {answer}")
         
         # Token usage
         #print(pipeline.token_tracker.report())
@@ -98,6 +98,7 @@ async def main():
         # Final token report
         #print(pipeline.token_tracker.report())
 
+
 def run_main():
     if sys.platform == "win32":
         import asyncio.proactor_events
@@ -108,7 +109,7 @@ def run_main():
                     return
                 self.close()
             except Exception:
-                pass
+                logging.error("Error during ProactorBasePipeTransport deletion", exc_info=True)
         
         asyncio.proactor_events._ProactorBasePipeTransport.__del__ = safe_del
         asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())

@@ -89,7 +89,7 @@ class IndexManager:
             await self.client.get_index(self.index_name)
             return True
         except ResourceNotFoundError:
-            logging.debug(f"Index '{self.index_name}' not found")
+            logging.error(f"Index '{self.index_name}' not found")
             return False
     
     async def create_index(self) -> None:
@@ -261,4 +261,4 @@ class IndexManager:
         try:
             await self.client.close()
         except Exception as e:
-            logging.debug(f"Error closing index manager: {e}")
+            logging.error(f"Error closing index manager: {e}")

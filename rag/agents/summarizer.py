@@ -10,7 +10,7 @@ This agent uses the LLM to:
 - Return a focused, goal-aligned summary
 """
 from ..agents.base_agents import BaseAgent
-
+from ..models import AgentResponse
 class SummarizerAgent(BaseAgent):
     def __init__(self, generator):
         """
@@ -66,8 +66,19 @@ class SummarizerAgent(BaseAgent):
             )
 
             # Return the summary in MCP format
-            return {"sender": "Summarizer", "content": {'output': final_output}}
+            #return {"sender": "Summarizer", "content": {'output': final_output}}
+            
+            return AgentResponse(
+                sender="Summarizer",
+                content={"output": final_output}
+            )
 
         except Exception as e:
             # Return a structured error message in case of failure
-            return {"sender": "Summarizer", "content": {'output': f'Error during summarization: {str(e)}'}}
+            #return {"sender": "Summarizer", "content": {'output': f'Error during summarization: {str(e)}'}}
+            return AgentResponse(
+                            sender="Summarizer",
+                            content={},
+                            status="error",
+                            error_message=str(e)
+                        )

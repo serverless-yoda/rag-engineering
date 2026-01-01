@@ -162,4 +162,4 @@ class VectorStoreRepository:
         try:
             await self.client.close()
         except Exception as e:
-            logging.debug(f"Error closing repository: {e}")
+            logging.error(f"Error closing repository: {e}")

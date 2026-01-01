@@ -5,6 +5,7 @@ import copy
 import logging
 from ..agents.registry import AgentRegistry
 from ..agents.planner import PlannerAgent
+from ..models import AgentResponse
 
 class ContextEngine:
     def __init__(self, searcher,generator , content_safety=None):
@@ -26,18 +27,17 @@ class ContextEngine:
             agent = self.registry.get(step['agent'])
             resolved_input = self._resolve_dependencies(step['input'], state)
             mcp_input = {"content": resolved_input}
-            mcp_output = await agent.execute(mcp_input)
-            state[f"STEP_{step['step']}_OUTPUT"] = mcp_output['content']
+            mcp_output: AgentResponse= await agent.execute(mcp_input)
+            state[f"STEP_{step['step']}_OUTPUT"] = mcp_output.content
             logging.info(f"Executed Step {step['step']} with agent {step['agent']}")
             logging.info(f"Input: {mcp_input}")
             logging.info(f"Output: {mcp_output}")
 
             
-            # Check if step was blocked
-            if isinstance(mcp_output['content'], dict) and mcp_output['content'].get('status') == 'blocked':
+            # Check if step was blocked            
+            if mcp_output.status == "blocked":
                 logging.warning(f"⚠️ Workflow blocked at step {step['step']}")
-                return mcp_output['content']
-
+                return mcp_output.content
         
         return state[f"STEP_{len(plan)}_OUTPUT"]
     

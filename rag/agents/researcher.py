@@ -11,6 +11,8 @@ import json
 from ..utils import sanitize_input
 from ..agents.base_agents import BaseAgent
 from ..interfaces import SearchProvider, GenerationProvider
+from ..models import AgentResponse
+
 class ResearcherAgent(BaseAgent):
     def __init__(self, searcher: SearchProvider, generator: GenerationProvider):
         """
@@ -32,38 +34,35 @@ class ResearcherAgent(BaseAgent):
         """
         self.validate_input(mcp_message['content'], ['topic'])
 
-        topic = mcp_message['content']['topic']
-        results = await self.searcher.search(query=topic, namespace="KnowledgeStore", top_k=3)
+        
+        try:
+            topic = mcp_message['content']['topic']
+            results = await self.searcher.search(query=topic, namespace="KnowledgeStore", top_k=3)
 
-        sanitized_chunks = []
-        for r in results:
-            chunk_text = str(r.chunk)
-            try:
-                sanitized_chunks.append(sanitize_input(chunk_text))
-            except Exception:
-                continue
+            chunks = [str(r.chunk) for r in results if r.chunk]
+            if not chunks:
+                return AgentResponse(
+                    sender="Researcher",
+                    content={},
+                    status="error",
+                    error_message="No valid chunks found"
+                )
 
-        if not sanitized_chunks:
-            return {
-                "sender": "Researcher",
-                "content": "Could not generate a reliable answer as retrieved data was suspect."
-            }
+            context = "\n\n".join(chunks)
+            system_prompt = "You are an expert research synthesis AI..."
+            facts = await self.generator.generate(question=topic, context=context, system_prompt=system_prompt)
 
-        sources_text = "\n\n---\n\n".join(sanitized_chunks)
-        system_prompt = (
-            "You are an expert research synthesis AI.\n"
-            "Synthesize the provided source texts into a concise, bullet-pointed summary "
-            "relevant to the user's topic. Focus strictly on the facts provided in the sources. "
-            "Do not add outside information."
-        )
-
-        result = await self.generator.generate(
-            question=f"Topic: {topic}",
-            context=sources_text,
-            system_prompt=system_prompt
-        )
-
-        return {"sender": "Researcher", "content": {'facts': result}}
+            return AgentResponse(
+                sender="Researcher",
+                content={"facts": facts}
+            )
+        except Exception as e:
+            return AgentResponse(
+                sender="Researcher",
+                content={},
+                status="error",
+                error_message=str(e)
+            )
 
     async def _execute(self, mcp_message):
         """

@@ -163,4 +163,4 @@ class AzureOpenAILLM(LLMProvider):
         try:
             await self.client.close()
         except Exception as e:
-            logging.debug(f"Error closing Azure OpenAI LLM: {e}")
+            logging.error(f"Error closing Azure OpenAI LLM: {e}")

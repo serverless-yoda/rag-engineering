@@ -77,15 +77,18 @@ class RAGPipeline:
         """Clean up resources."""
         for client in [self.embedder, self.store, self.llm, self.index_manager]:
             try:
+                logging.info(f"Closing {self.__class__.__name__} at {hex(id(self))}")
                 await client.close()
+                logging.info(f"Done closing {client.__class__.__name__}")
+                
             except Exception:
-                pass
+                logging.error(f"Error closing {client.__class__.__name__}: {e}")
         
         if self.content_safety:
             try:
                 await self.content_safety.close()
             except Exception as e:
-                logging.debug(f"Error closing content safety: {e}")
+                logging.error(f"Error closing content safety: {e}")
 
     
     # === High-Level Workflows ===

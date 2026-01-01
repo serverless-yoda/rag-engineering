@@ -10,6 +10,7 @@ This agent uses the LLM to produce structured output based on:
 """
 
 from ..agents.base_agents import BaseAgent
+from ..models import AgentResponse
 class WriterAgent(BaseAgent):
     def __init__(self, generator, content_safety=None):
         """
@@ -28,7 +29,7 @@ class WriterAgent(BaseAgent):
         Returns:
             Dict with generated 'output' as content.
         """
-        self.validate_input(mcp_message['content'], ['blueprint','facts','previous_content'])
+        #self.validate_input(mcp_message['content'], ['blueprint','facts','previous_content'])
         content = mcp_message['content']
         blueprint_json = content.get('blueprint', '{}')
         facts = content.get('facts', '')
@@ -77,23 +78,36 @@ Adhere strictly to the blueprint's instructions, style guides, and goals. The bl
 Generate the content now.
 """
         
-        final_output = await self.generator.generate(question=user_prompt, context="", system_prompt=system_prompt)
+        try:
+
+            final_output = await self.generator.generate(question=user_prompt, context="", system_prompt=system_prompt)
+            # Content safety check      
+            # Commenting this: its failing because of self.content_safety is None in some tests
+            # moderation_result = await self.content_safety.moderate_text(final_output)
+            # if not moderation_result["is_safe"]:
+            #     logging.warning(f"Writer output blocked: {moderation_result['recommendation']}")
+            #     return {
+            #             "sender": "Writer",
+            #             "content": {
+            #                 "output": "⚠️ Content blocked by safety filters",
+            #                 "moderation_result": moderation_result,
+            #                 "status": "blocked",
+            #             }
+            #         }
+                
+            # logging.info(f"✅ Content moderation passed. Scores: {moderation_result['severity_scores']}")
+            return AgentResponse(
+                            sender="Writer",
+                            content={"output": final_output}
+                    )
+
+        except Exception as e:            
+            return AgentResponse(
+                            sender="Writer",
+                            content={},
+                            status="error",
+                            error_message=str(e)
+                        )
         
-        # Content safety check      
-        # Commenting this: its failing because of self.content_safety is None in some tests
-        # moderation_result = await self.content_safety.moderate_text(final_output)
-        # if not moderation_result["is_safe"]:
-        #     logging.warning(f"Writer output blocked: {moderation_result['recommendation']}")
-        #     return {
-        #             "sender": "Writer",
-        #             "content": {
-        #                 "output": "⚠️ Content blocked by safety filters",
-        #                 "moderation_result": moderation_result,
-        #                 "status": "blocked",
-        #             }
-        #         }
-            
-        # logging.info(f"✅ Content moderation passed. Scores: {moderation_result['severity_scores']}")
+        
 
-
-        return {"sender": "Writer", "content": {'output': final_output}}

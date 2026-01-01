@@ -130,16 +130,19 @@ class AzureContentSafety:
                 "error": str(e),
             }
     
+    
+    # implementations/azure_content_safety.py
     async def close(self) -> None:
         """
         Close the Azure Content Safety client connection.
-        
-        Gracefully closes the underlying HTTP client and connection pool.
         Safe to call multiple times.
         """
         try:
-            await self.client.close()
+            if self.client:
+                await self.client.close()
+            else:
+                logging.debug("AzureContentSafety client is None — nothing to close.")
         except Exception as e:
-            # Log but don't raise - cleanup should be silent
             logging.debug(f"Error closing Azure Content Safety: {e}")
 
+    
