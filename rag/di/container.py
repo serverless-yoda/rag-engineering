@@ -19,7 +19,7 @@ from ..core import (
     SemanticSearcher,
     AnswerGenerator,
 )
-from ..utils import TokenTracker
+from ..utils import TokenTracker, TrackedEmbeddingProvider
 from ..pipeline.rag_pipeline import RAGPipeline
 
 class Container(containers.DeclarativeContainer):
@@ -29,7 +29,13 @@ class Container(containers.DeclarativeContainer):
     
     # Token tracker (singleton)
     token_tracker = providers.Singleton(TokenTracker)
-    
+
+    embedder = providers.Factory(
+        TrackedEmbeddingProvider,
+        embedder=providers.Factory(AzureOpenAIEmbedder, ...),
+        tracker=token_tracker,
+    )
+
     # Embedding provider
     embedder = providers.Factory(
         AzureOpenAIEmbedder,

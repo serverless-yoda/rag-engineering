@@ -16,6 +16,8 @@ from .tokens_utils import count_tokens
 from .normalize_utils import normalize_file_items
 from .generictext_utils import file_to_text_content
 from .tokens_utils import TokenTracker, TokenUsage
+from .tracking_decorators import TrackedEmbeddingProvider
+
 __all__ = [
     "to_text_content",
     "strip_html",
@@ -34,4 +36,5 @@ __all__ = [
     "make_item_source_id",
     "TokenTracker",
     "TokenUsage",
+    "TrackedEmbeddingProvider"
 ]
