@@ -6,7 +6,7 @@ import logging
 from ..agents.registry import AgentRegistry
 from ..agents.planner import PlannerAgent
 from ..models import AgentResponse
-
+from typing import Dict
 class ContextEngine:
     def __init__(self, searcher,generator , content_safety=None):
         
@@ -41,7 +41,42 @@ class ContextEngine:
         
         return state[f"STEP_{len(plan)}_OUTPUT"]
     
-    def _resolve_dependencies(self, input_params, state):
+    
+    def _resolve_dependencies(self, input_params: Dict, state: Dict) -> Dict:
+        """
+        Resolve STEP_X_OUTPUT references with validation.
+        Handles nested content extraction (e.g., {'facts': 'text'} -> 'text').
+        """
+        resolved = copy.deepcopy(input_params)
+        
+        for key, value in resolved.items():
+            if isinstance(value, str) and value.startswith("STEP_"):
+                # Validate dependency exists
+                if value not in state:
+                    available = [k for k in state.keys() if k.startswith("STEP_")]
+                    raise ValueError(
+                        f"Unresolved dependency: '{value}' in input parameter '{key}'\n"
+                        f"Available outputs: {available}"
+                    )
+                
+                resolved_value = state[value]
+                
+                # Smart unwrapping: if resolved value is a dict with a single content key, extract it
+                if isinstance(resolved_value, dict):
+                    # Try common content keys
+                    for content_key in ['output', 'facts', 'summary', 'blueprint']:
+                        if content_key in resolved_value:
+                            resolved[key] = resolved_value[content_key]
+                            break
+                    else:
+                        # No common key, pass whole dict
+                        resolved[key] = resolved_value
+                else:
+                    resolved[key] = resolved_value
+        
+        return resolved
+
+    def _Xresolve_dependencies(self, input_params, state):
         """Replace STEP_X_OUTPUT references with actual data."""
         resolved = copy.deepcopy(input_params)
         for key, value in resolved.items():

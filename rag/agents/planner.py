@@ -9,9 +9,9 @@ to synthesize the plan in JSON format.
 """
 
 import json
+import re
+from typing import List, Dict
 from ..abstractions.llm_provider import LLMProvider
-
-
 class PlannerAgent:
     """
     PlannerAgent: Uses the LLM to generate a structured execution plan.
@@ -29,13 +29,31 @@ class PlannerAgent:
     ]
     """
 
-    def __init__(self, pipeline):
-        """
-        Initialize with access to the pipeline's LLM provider.
-        """
-        self.llm: LLMProvider = pipeline.llm
+    def __init__(self, generator):
+        self.generator = generator
 
-    async def create_plan(self, goal: str, capabilities: str) -> list:
+    def _extract_json_from_response(self, response: str) -> dict:
+        """Extract JSON from LLM response, handling markdown fences."""
+        # Handle ```json ... ``` or ``` ... ```
+        match = re.search(r"```(?:json)?\s*(\{.*?\}|\[.*?\])\s*```", response, re.DOTALL)
+        if match:
+            response = match.group(1)
+
+        # Strip leading/trailing whitespace
+        return json.loads(response.strip())
+
+    def _validate_plan_schema(self, plan: List[dict]) -> None:
+        """Ensure each step has required fields."""
+        if not isinstance(plan, list):
+            raise ValueError(f"Plan must be a list, got {type(plan)}")
+
+        for i, step in enumerate(plan):
+            required = ['step', 'agent', 'input']
+            missing = [f for f in required if f not in step]
+            if missing:
+                raise ValueError(f"Step {i} missing fields: {missing}. Step: {step}")
+
+    async def create_plan(self, goal: str, capabilities: str) -> List[dict]:
         """
         Generate a multi-step plan using the LLM.
 
@@ -49,6 +67,7 @@ class PlannerAgent:
         Raises:
             ValueError if the LLM response is not a valid JSON list
         """
+
         system_prompt = f"""
         You are the strategic planner of a multi-agent AI system.
         Your job is to break down the user's goal into a structured execution plan.
@@ -73,28 +92,31 @@ class PlannerAgent:
         """
 
         try:
-            response = await self.llm.generate(
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": goal}
-                ],
-                temperature=0.3
+            response = await self.generator.generate(
+                question=goal,
+                context="",
+                system_prompt=system_prompt
             )
-            plan = json.loads(response)
 
-            # Handle wrapped responses
-            if isinstance(plan, dict):
-                if "plan" in plan and isinstance(plan["plan"], list):
-                    return plan["plan"]
-                elif "steps" in plan and isinstance(plan["steps"], list):
-                    return plan["steps"]
+            plan_data = self._extract_json_from_response(response)
+
+            # Handle wrapped dicts
+            if isinstance(plan_data, dict):
+                if "plan" in plan_data:
+                    plan = plan_data["plan"]
+                elif "steps" in plan_data:
+                    plan = plan_data["steps"]
                 else:
-                    raise ValueError("Planner returned a dict, but missing 'plan' or 'steps' key.")
+                    raise ValueError(f"Expected 'plan' or 'steps' key, got: {list(plan_data.keys())}")
+            else:
+                plan = plan_data
 
-            if not isinstance(plan, list):
-                raise ValueError("Planner did not return a valid JSON list.")
-
+            self._validate_plan_schema(plan)
             return plan
 
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Failed to parse plan as JSON: {e}\n\nRaw response:\n{response[:500]}")
         except Exception as e:
             raise ValueError(f"Planner failed to generate a valid plan: {e}")
+
+
