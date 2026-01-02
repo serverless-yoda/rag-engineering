@@ -81,6 +81,62 @@ class DocumentIngester:
         self.index_manager = index_manager
         self.batch_size = batch_size
     
+    
+    async def ingest_documents_streaming(
+        self,
+        items: List[Any],
+        namespace: str = "KnowledgeStore",
+        **kwargs
+    ) -> IngestionResult:
+        """
+        Process and upload in mini-batches to reduce memory usage.
+        Suitable for large file collections.
+        """
+        start_time = time.time()
+        total_processed = 0
+        total_chunks = 0
+        total_uploaded = 0
+        errors = []
+        
+        # Process items in small batches
+        for batch_items in batched(items, batch_size=10):  # 10 files at a time
+            for item in batch_items:
+                try:
+                    text = file_to_text_content(item)
+                    chunks = chunk_text(text)
+                    
+                    # Embed and upload immediately (don't accumulate)
+                    embeddings = []
+                    for chunk_batch in batched(chunks, self.batch_size):
+                        chunk_embeddings = await self.embedder.embed(chunk_batch)
+                        embeddings.extend(chunk_embeddings)
+                    
+                    docs = make_search_documents(
+                        namespace=namespace,
+                        source_id=make_item_source_id(item, total_processed, "streaming"),
+                        content_chunks=chunks,
+                        embeddings=embeddings,
+                    )
+                    
+                    uploaded = await self.store.upsert_documents(docs)
+                    total_uploaded += uploaded
+                    total_chunks += len(chunks)
+                    
+                except Exception as e:
+                    errors.append(f"Item {total_processed}: {str(e)}")
+                
+                total_processed += 1
+        
+        return IngestionResult(
+            success=len(errors) == 0,
+            documents_processed=total_processed,
+            chunks_created=total_chunks,
+            documents_uploaded=total_uploaded,
+            errors=errors,
+            duration_seconds=time.time() - start_time
+        )
+
+
     async def ingest_documents(
         self,
         items: List[Union[str, Dict[str, Any]]],
