@@ -11,6 +11,13 @@ This agent uses the LLM to produce structured output based on:
 
 from ..agents.base_agents import BaseAgent
 from ..models import AgentResponse
+from ..agents.registry import AgentRegistry
+
+@AgentRegistry.register(
+    name="writer",
+    capabilities="Generates or rewrites content by applying a Blueprint to source material.",
+    required_inputs=["blueprint", "facts","previous_content"]
+)
 class WriterAgent(BaseAgent):
     def __init__(self, generator, content_safety=None):
         """
@@ -29,7 +36,6 @@ class WriterAgent(BaseAgent):
         Returns:
             Dict with generated 'output' as content.
         """
-        #self.validate_input(mcp_message['content'], ['blueprint','facts','previous_content'])
         content = mcp_message['content']
         blueprint_json = content.get('blueprint', '{}')
         facts = content.get('facts', '')

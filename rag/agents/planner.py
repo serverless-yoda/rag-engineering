@@ -12,6 +12,7 @@ import json
 import re
 from typing import List, Dict
 from ..abstractions.llm_provider import LLMProvider
+
 class PlannerAgent:
     """
     PlannerAgent: Uses the LLM to generate a structured execution plan.
@@ -42,18 +43,20 @@ class PlannerAgent:
         # Strip leading/trailing whitespace
         return json.loads(response.strip())
 
-    def _validate_plan_schema(self, plan: List[dict]) -> None:
-        """Ensure each step has required fields."""
-        if not isinstance(plan, list):
-            raise ValueError(f"Plan must be a list, got {type(plan)}")
-
+    
+    def _validate_plan_schema(self, plan: List[dict], known_agents: List[str]) -> None:
         for i, step in enumerate(plan):
             required = ['step', 'agent', 'input']
             missing = [f for f in required if f not in step]
             if missing:
                 raise ValueError(f"Step {i} missing fields: {missing}. Step: {step}")
 
-    async def create_plan(self, goal: str, capabilities: str) -> List[dict]:
+            agent_name = step['agent'].lower()
+            if agent_name not in known_agents:
+                raise ValueError(f"Unknown agent '{agent_name}' in step {i}")
+
+
+    async def create_plan(self, goal: str, capabilities: str,known_agents: List[str]) -> List[dict]:
         """
         Generate a multi-step plan using the LLM.
 
@@ -111,7 +114,8 @@ class PlannerAgent:
             else:
                 plan = plan_data
 
-            self._validate_plan_schema(plan)
+            
+            self._validate_plan_schema(plan, known_agents=known_agents)
             return plan
 
         except json.JSONDecodeError as e:

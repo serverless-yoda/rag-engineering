@@ -89,7 +89,7 @@ class AnswerGenerator:
             {"role": "system", "content": prompt},
             {"role": "user", "content": user_message},
         ]
-
+        logging.info(f"Sending messages to LLM: {messages}")
         try:
             # Send messages to LLMProvider and return response
             answer = await self.llm.generate(

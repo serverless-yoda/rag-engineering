@@ -4,6 +4,13 @@
 import json
 from ..agents.base_agents import BaseAgent
 from ..models import AgentResponse
+from ..agents.registry import AgentRegistry
+
+@AgentRegistry.register(
+    name="librarian",
+    capabilities="Retrieves Semantic Blueprints (style/structure instructions).",
+    required_inputs=["intent"]
+)
 
 class LibrarianAgent(BaseAgent):
     def __init__(self, searcher):
@@ -27,13 +34,11 @@ class LibrarianAgent(BaseAgent):
             else:
                 content = {'blueprint': json.dumps({'instruction': 'Generate neutral content'})}
             
-            #return {"sender": "Librarian", "content": content}
             return AgentResponse(
                     sender="Librarian",
                     content={"content": content}
                 )
         except Exception as e:
-            #return {"sender": "Librarian", "content": {'output': f'Error during retrieval: {str(e)}'}}
             return AgentResponse(
                             sender="Librarian",
                             content={},

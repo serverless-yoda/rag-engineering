@@ -11,6 +11,13 @@ This agent uses the LLM to:
 """
 from ..agents.base_agents import BaseAgent
 from ..models import AgentResponse
+from ..agents.registry import AgentRegistry
+
+@AgentRegistry.register(
+    name="summarizer",
+    capabilities="Reduces large text to a concise summary based on a specific objective. Ideal for managing token counts before a generation step",
+    required_inputs=["text_to_summarize", "summary_objective"]
+)
 class SummarizerAgent(BaseAgent):
     def __init__(self, generator):
         """
@@ -41,10 +48,7 @@ class SummarizerAgent(BaseAgent):
             text_to_summarize = mcp_message['content'].get('text_to_summarize', "")
             summary_objective = mcp_message['content'].get('summary_objective', "")
             
-            # Validate input presence
-            #if not text_to_summarize or not summary_objective:
-            #    raise ValueError("Both 'text_to_summarize' and 'summary_objective' must be provided..")
-
+            
             # Define the system prompt to guide the LLM's behavior
             system_prompt = (
                 "You are an expert summarization AI. Your task is to reduce the provided text to its essential points, "
@@ -65,17 +69,12 @@ class SummarizerAgent(BaseAgent):
                 system_prompt=system_prompt
             )
 
-            # Return the summary in MCP format
-            #return {"sender": "Summarizer", "content": {'output': final_output}}
-            
             return AgentResponse(
                 sender="Summarizer",
                 content={"output": final_output}
             )
 
         except Exception as e:
-            # Return a structured error message in case of failure
-            #return {"sender": "Summarizer", "content": {'output': f'Error during summarization: {str(e)}'}}
             return AgentResponse(
                             sender="Summarizer",
                             content={},

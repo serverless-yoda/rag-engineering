@@ -6,18 +6,33 @@ import logging
 from ..agents.registry import AgentRegistry
 from ..agents.planner import PlannerAgent
 from ..models import AgentResponse
+
+
+# Ensure agent modules are loaded
+from ..agents.researcher import ResearcherAgent
+from ..agents.writer import WriterAgent
+from ..agents.summarizer import SummarizerAgent
+from ..agents.librarian import LibrarianAgent
+
+
 from typing import Dict
 class ContextEngine:
     def __init__(self, searcher,generator , content_safety=None):
         
-        self.registry = AgentRegistry(searcher, generator, content_safety)
+        self.registry = AgentRegistry(
+            searcher=searcher,
+            generator=generator,
+            content_safety=content_safety
+        )
+
         self.planner = PlannerAgent(generator)
     
     async def execute(self, goal: str):
         # Phase 1: Plan
         plan = await self.planner.create_plan(
             goal, 
-            self.registry.get_capabilities()
+            self.registry.get_capabilities(),
+            known_agents=list(self.registry._registry.keys())
         )
         logging.info(f"Executed Planner: {plan}")
         
@@ -29,9 +44,9 @@ class ContextEngine:
             mcp_input = {"content": resolved_input}
             mcp_output: AgentResponse= await agent.execute(mcp_input)
             state[f"STEP_{step['step']}_OUTPUT"] = mcp_output.content
-            logging.info(f"Executed Step {step['step']} with agent {step['agent']}")
-            logging.info(f"Input: {mcp_input}")
-            logging.info(f"Output: {mcp_output}")
+            print(f"Executed Step {step['step']} with agent {step['agent']}")
+            print(f"Input: {mcp_input}")
+            print(f"Output: {mcp_output}")
 
             
             # Check if step was blocked            

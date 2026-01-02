@@ -7,12 +7,17 @@ This agent performs semantic search over the 'KnowledgeStore' namespace
 and uses the LLM to summarize the retrieved chunks into concise facts.
 """
 
-import json
 from ..utils import sanitize_input
 from ..agents.base_agents import BaseAgent
 from ..interfaces import SearchProvider, GenerationProvider
 from ..models import AgentResponse
+from ..agents.registry import AgentRegistry
 
+@AgentRegistry.register(
+    name="researcher",
+    capabilities="Retrieves and synthesizes factual information on a topic.",
+    required_inputs=["topic"]
+)
 class ResearcherAgent(BaseAgent):
     def __init__(self, searcher: SearchProvider, generator: GenerationProvider):
         """
@@ -49,7 +54,12 @@ class ResearcherAgent(BaseAgent):
                 )
 
             context = "\n\n".join(chunks)
-            system_prompt = "You are an expert research synthesis AI..."
+            system_prompt = (
+                "You are an expert research synthesis AI.\n"
+                "Synthesize the provided source texts into a concise, bullet-pointed summary "
+                "relevant to the user's topic. Focus strictly on the facts provided in the sources. "
+                "Do not add outside information."
+            )
             facts = await self.generator.generate(question=topic, context=context, system_prompt=system_prompt)
 
             return AgentResponse(
