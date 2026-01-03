@@ -11,7 +11,7 @@ interface with Azure OpenAI or other LLM services.
 import logging
 from typing import List, Optional
 from ..abstractions.llm_provider import LLMProvider
-
+from ..models import GenerationError
 
 class AnswerGenerator:
     """
@@ -102,4 +102,4 @@ class AnswerGenerator:
             return answer
         except Exception as e:
             logging.error(f"Answer generation failed: {e}")
-            raise
+            raise GenerationError(f"Answer generation failed: {e}") from e

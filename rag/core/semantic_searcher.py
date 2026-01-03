@@ -13,6 +13,7 @@ from typing import List, Optional
 from ..abstractions.embedding_provider import EmbeddingProvider
 from ..abstractions.vector_store_provider import VectorStoreProvider
 from ..models.types import SearchResult
+from ..models import SearchError
 
 
 class SemanticSearcher:
@@ -115,8 +116,8 @@ class SemanticSearcher:
         # Step 1: Ensure index exists
         if not await self.index_manager.index_exists():
             logging.warning("Search index does not exist. Returning empty results.")
-            return []
-
+            raise SearchError(f"Search index does not exist. Returning empty results.")
+           
         # Step 2: Embed the query
         try:
             query_embeddings = await self.embedder.embed([query])
@@ -126,7 +127,8 @@ class SemanticSearcher:
             query_vector = query_embeddings[0]
         except Exception as e:
             logging.error(f"Query embedding failed: {e}")
-            return []
+            raise SearchError(f"Query embedding failed: {e}") from e
+            
 
         # Step 3: Build filter expression
         combined_filter = self._build_filter(namespace, filter_expr)
@@ -140,7 +142,8 @@ class SemanticSearcher:
             )
         except Exception as e:
             logging.error(f"Vector search failed: {e}")
-            return []
+            raise SearchError(f"Vector search failed: {e}") from e
+            
 
         # Step 5: Normalize results
         results = [SearchResult.from_dict(r) for r in raw_results]

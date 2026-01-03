@@ -9,6 +9,7 @@ from azure.core.credentials import AzureKeyCredential
 from azure.ai.contentsafety import ContentSafetyClient
 from azure.ai.contentsafety.models import AnalyzeTextOptions
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from ..models import SafetyCheckError
 
 class ContentSafetyError(Exception):
     """Custom exception for content safety violations."""
@@ -119,7 +120,7 @@ class AzureContentSafety:
             
             return result
             
-        except Exception as e:
+        except SafetyCheckError as e:
             logging.error(f"Content Safety API error: {e}")
             # Fail-open: allow content but log error
             return {

@@ -8,7 +8,7 @@ Exports all configuration objects and result types used throughout the B.I.S.A. 
 from .env import env_settings
 from .config import RAGConfig
 from .agent_response import AgentResponse
-
+from .exceptions import PipelineError, SearchError, GenerationError, IngestionError, SafetyCheckError, PlanningError, AgentExecutionError
 from .types import (
     ChunkingConfig,
     IngestionResult,
@@ -23,4 +23,11 @@ __all__ = [
     "RAGConfig",
     "env_settings",
     "AgentResponse",
+    "PipelineError",
+    "SearchError",  
+    "GenerationError",
+    "IngestionError",
+    "SafetyCheckError",
+    "PlanningError",
+    "AgentExecutionError",
 ]
