@@ -3,8 +3,8 @@
 
 """Base abstraction for all agents."""
 from abc import ABC, abstractmethod
-from typing import Dict, Any
-
+from typing import Dict, Any, Optional
+from ..models import AgentResponse
 class BaseAgent(ABC):
     """Abstract base class for agents in the multi-agent system."""
     
@@ -21,5 +21,18 @@ class BaseAgent(ABC):
         for field in required_keys:
             if field not in content:
                 raise ValueError(f"Missing required field: {field}")
+            
+    
+    async def teardown(self):
+        """Called on shutdown or context exit"""
+        pass
+
+    
+    async def on_error(self, error: Exception, context: Dict[str, Any]) -> Optional[AgentResponse]:
+        """
+        Error recovery hook. Return AgentResponse to continue, None to propagate error.
+        """
+        return None
+
             
         

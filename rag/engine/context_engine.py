@@ -14,7 +14,7 @@ from ..agents.writer import WriterAgent
 from ..agents.summarizer import SummarizerAgent
 from ..agents.librarian import LibrarianAgent
 
-from typing import Dict
+from typing import Dict, Optional
 class ContextEngine:
     def __init__(self, searcher,generator , content_safety=None):
         
@@ -26,7 +26,67 @@ class ContextEngine:
 
         self.planner = PlannerAgent(generator)
     
+    
     async def execute(self, goal: str):
+        try:
+            # Phase 1: Plan
+            plan = await self.planner.create_plan(
+                goal,
+                self.registry.get_capabilities(),
+                known_agents=list(self.registry._registry.keys())
+            )
+            logging.info(f"Executed Planner: {plan}")
+
+            # Phase 2: Setup agents
+            used_agents = {step['agent'].lower() for step in plan}
+            for agent_name in used_agents:
+                agent = self.registry.get(agent_name)
+                if hasattr(agent, "setup"):
+                    await agent.setup()
+
+            # Phase 3: Execute with context chaining
+            state = {}
+            for step in plan:
+                agent_name = step['agent'].lower()
+                agent = self.registry.get(agent_name)
+                resolved_input = self._resolve_dependencies(step['input'], state)
+                mcp_input = {"content": resolved_input}
+
+                try:
+                    mcp_output: AgentResponse = await agent.execute(mcp_input)
+                except Exception as e:
+                    logging.error(f"❌ Agent '{agent_name}' failed at step {step['step']}: {e}")
+                    if hasattr(agent, "on_error"):
+                        recovery = await agent.on_error(e, {"step": step, "input": mcp_input})
+                        if recovery:
+                            mcp_output = recovery
+                        else:
+                            raise
+                    else:
+                        raise
+
+                state[f"STEP_{step['step']}_OUTPUT"] = mcp_output.content
+                print(f"Executed Step {step['step']} with agent {step['agent']}")
+                print(f"Input: {mcp_input}")
+                print(f"Output: {mcp_output}")
+
+                if mcp_output.status == "blocked":
+                    logging.warning(f"⚠️ Workflow blocked at step {step['step']}")
+                    return mcp_output.content
+
+            # Phase 4: Teardown agents
+            for agent_name in used_agents:
+                agent = self.registry.get(agent_name)
+                if hasattr(agent, "teardown"):
+                    await agent.teardown()
+
+            return state[f"STEP_{len(plan)}_OUTPUT"]
+
+        except PipelineError as e:
+            logging.error(f"❌ Pipeline error: {e}")
+            return {"error": str(e)}
+
+    async def ____execute(self, goal: str):
         try:
 
             # Phase 1: Plan

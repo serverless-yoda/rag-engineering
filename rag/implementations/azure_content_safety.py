@@ -120,16 +120,22 @@ class AzureContentSafety:
             
             return result
             
-        except SafetyCheckError as e:
+        
+        except Exception as e:
             logging.error(f"Content Safety API error: {e}")
-            # Fail-open: allow content but log error
-            return {
-                "is_safe": True,
-                "severity_scores": {},
-                "blocked_categories": [],
-                "recommendation": f"⚠️ Moderation service unavailable: {str(e)}",
-                "error": str(e),
-            }
+            
+            if self.fail_open:
+                # Allow content but log warning
+                logging.warning("⚠️ Content Safety failed, allowing by policy")
+                return {"is_safe": True, "error": str(e), "bypassed": True}
+            else:
+                # Block content for safety
+                return {
+                    "is_safe": False,
+                    "blocked_categories": ["service_error"],
+                    "recommendation": f"🚫 Blocked: Safety check failed ({e})",
+                    "error": str(e),
+                }
     
     
     # implementations/azure_content_safety.py
