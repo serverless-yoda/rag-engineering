@@ -15,6 +15,8 @@ from .types import (
     SearchResult,
     JsonDict,
 )
+from .execution_trace import ExecutionTrace
+
 __all__ = [
     "ChunkingConfig",
     "IngestionResult",  
@@ -30,4 +32,5 @@ __all__ = [
     "SafetyCheckError",
     "PlanningError",
     "AgentExecutionError",
+    "ExecutionTrace"
 ]

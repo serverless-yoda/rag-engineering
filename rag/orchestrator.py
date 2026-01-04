@@ -98,6 +98,10 @@ async def main():
         
         # Final token report
         #print(pipeline.token_tracker.report())
+        
+        # Show execution trace
+        report = pipeline.context_engine.get_execution_report()
+        print(report)
 
 
 def run_main():
