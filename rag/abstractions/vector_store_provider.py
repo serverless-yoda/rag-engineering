@@ -15,7 +15,7 @@ class VectorStoreProvider(ABC):
     Abstract base class for vector storage and retrieval services.
     
     Implementations must provide:
-    1. upsert_documents() to store document chunks with embeddings
+    1. save_documents() to store document chunks with embeddings
     2. vector_search() to find similar documents
     3. get_document_count() to get total indexed documents
     4. close() to cleanup resources
@@ -27,7 +27,7 @@ class VectorStoreProvider(ABC):
     """
 
     @abstractmethod
-    async def upsert_documents(self, documents: List[Dict[str, Any]]) -> int:
+    async def save_documents(self, documents: List[Dict[str, Any]]) -> int:
         """
         Upload or update documents in the vector store.
         

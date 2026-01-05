@@ -20,7 +20,7 @@ def now_iso() -> str:
         ISO 8601 formatted timestamp string
     
     Used by:
-        - make_search_documents() to set the created_at field
+        - create_search_documents() to set the created_at field
     
     Example:
         >>> now_iso()
@@ -45,7 +45,7 @@ def ensure_namespace(ns: str, default_ns: str = "KnowledgeStore") -> str:
         Trimmed namespace or default_ns if input is empty
     
     Used by:
-        - make_search_documents() to normalize namespace before storage
+        - create_search_documents() to normalize namespace before storage
         - SemanticSearcher._build_filter() to normalize namespace in filters
     
     Example:

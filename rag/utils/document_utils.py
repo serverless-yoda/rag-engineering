@@ -18,7 +18,7 @@ from .metadata_utils import ensure_namespace, now_iso
 JsonDict = Dict[str, Any]
 
 
-def make_search_documents(
+def create_search_documents(
     namespace: str,
     source_id: str,
     content_chunks: List[str],
@@ -59,7 +59,7 @@ def make_search_documents(
     Example:
         >>> chunks = ["chunk 1", "chunk 2"]
         >>> embeddings = [[0.1, 0.2, ...], [0.3, 0.4, ...]]
-        >>> docs = make_search_documents(
+        >>> docs = create_search_documents(
         ...     namespace="MyDocs",
         ...     source_id="doc123",
         ...     content_chunks=chunks,
@@ -123,7 +123,7 @@ def make_search_documents(
     
     return docs
 
-def normalize_items(items):
+def normalize_text_items(items):
     # Accept a single str/bytes/dict and make it a list
     if items is None:
         return []

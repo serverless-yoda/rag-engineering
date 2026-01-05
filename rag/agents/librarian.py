@@ -2,7 +2,7 @@
 
 """Librarian agent: Retrieves semantic blueprints."""
 import json
-from ..agents.base_agents import BaseAgent
+from .base_agent import BaseAgent
 from ..models import AgentResponse
 from ..agents.registry import AgentRegistry
 

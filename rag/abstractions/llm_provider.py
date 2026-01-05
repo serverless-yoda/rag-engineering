@@ -62,12 +62,25 @@ class LLMProvider(ABC):
         pass
     
     @abstractmethod
-    async def safe_generate(
+    async def generate_with_retry(
         self,
         messages: List[Dict[str, str]],
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
     ) -> str:
+        """
+        Docstring for generate_with_retry
+        
+        :param self: Description
+        :param messages: Description
+        :type messages: List[Dict[str, str]]
+        :param temperature: Description
+        :type temperature: float
+        :param max_tokens: Description
+        :type max_tokens: Optional[int]
+        :return: Description
+        :rtype: str
+        """
         pass
 
     @abstractmethod

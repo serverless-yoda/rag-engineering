@@ -33,7 +33,7 @@ class AzureSearchStore(VectorStoreProvider):
         ...     api_key="key456",
         ...     index_name="rag-index",
         ... )
-        >>> await store.upsert_documents([{...}])
+        >>> await store.save_documents([{...}])
         >>> results = await store.vector_search(query_vec, top_k=5)
         >>> await store.close()
     """
@@ -66,9 +66,9 @@ class AzureSearchStore(VectorStoreProvider):
         # Initialize repository for data access
         self.repository = VectorStoreRepository(self.client)
 
-    async def upsert_documents(self, documents: List[Dict[str, Any]]) -> int:
+    async def save_documents(self, documents: List[Dict[str, Any]]) -> int:
         """Upload documents via repository."""
-        return await self.repository.upsert_documents(documents)
+        return await self.repository.save_documents(documents)
 
     async def vector_search(
         self,

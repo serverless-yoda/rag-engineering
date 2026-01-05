@@ -147,7 +147,7 @@ def _read_text_from_fileobj(fileobj, name_hint: Optional[str] = None) -> Optiona
 
 def _ensure_normalized(item: Any) -> Dict[str, Any]:
     """
-    Accepts either a normalized dict (from normalize_items) or raw input,
+    Accepts either a normalized dict (from normalize_text_items) or raw input,
     and returns a normalized dict with keys: name, mime_type, source, content?
     """
     # If it already looks normalized (has mime_type and source)
@@ -155,7 +155,7 @@ def _ensure_normalized(item: Any) -> Dict[str, Any]:
         return item
 
     # Otherwise, reuse the normalize_single_item logic inline (simplified),
-    # or better: call your normalize_items([item])[0]. Here we do a minimal version.
+    # or better: call your normalize_text_items([item])[0]. Here we do a minimal version.
     from pathlib import Path as _Path
     import mimetypes as _mimetypes
 

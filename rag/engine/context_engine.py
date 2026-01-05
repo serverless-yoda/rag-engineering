@@ -108,40 +108,6 @@ class ContextEngine:
             logging.error(f"❌ Pipeline error: {e}")
             return {"error": str(e)}
 
-    async def ____execute(self, goal: str):
-        try:
-
-            # Phase 1: Plan
-            plan = await self.planner.create_plan(
-                goal, 
-                self.registry.get_capabilities(),
-                known_agents=list(self.registry._registry.keys())
-            )
-            logging.info(f"Executed Planner: {plan}")
-            
-            # Phase 2: Execute with context chaining
-            state = {}
-            for step in plan:
-                agent = self.registry.get(step['agent'])
-                resolved_input = self._resolve_dependencies(step['input'], state)
-                mcp_input = {"content": resolved_input}
-                mcp_output: AgentResponse= await agent.execute(mcp_input)
-                state[f"STEP_{step['step']}_OUTPUT"] = mcp_output.content
-                print(f"Executed Step {step['step']} with agent {step['agent']}")
-                print(f"Input: {mcp_input}")
-                print(f"Output: {mcp_output}")
-
-                
-                # Check if step was blocked            
-                if mcp_output.status == "blocked":
-                    logging.warning(f"⚠️ Workflow blocked at step {step['step']}")
-                    return mcp_output.content
-            
-            return state[f"STEP_{len(plan)}_OUTPUT"]
-        except PipelineError as e:              
-            logging.error(f"❌ Pipeline error: {e}")
-            return {"error": str(e)}
-  
     
     def _resolve_dependencies(self, input_params: Dict, state: Dict) -> Dict:
         """

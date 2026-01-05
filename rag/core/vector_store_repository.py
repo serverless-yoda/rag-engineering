@@ -31,7 +31,7 @@ class VectorStoreRepository:
         wait=wait_exponential(multiplier=1, min=2, max=10),
         retry=retry_if_exception_type((Exception,)),
     )
-    async def upsert_documents(self, documents: List[Dict[str, Any]]) -> int:
+    async def save_documents(self, documents: List[Dict[str, Any]]) -> int:
         """
         Upload documents to Azure AI Search.
         Upload documents with retry protection.

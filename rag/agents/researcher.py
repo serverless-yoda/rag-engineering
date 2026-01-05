@@ -8,7 +8,7 @@ and uses the LLM to summarize the retrieved chunks into concise facts.
 """
 
 from ..utils import sanitize_input
-from ..agents.base_agents import BaseAgent
+from .base_agent import BaseAgent
 from ..interfaces import SearchProvider, GenerationProvider
 from ..models import AgentResponse
 from ..agents.registry import AgentRegistry

@@ -9,7 +9,7 @@ This agent uses the LLM to produce structured output based on:
 - previous_content: optional existing content to rewrite
 """
 
-from ..agents.base_agents import BaseAgent
+from .base_agent import BaseAgent
 from ..models import AgentResponse
 from ..agents.registry import AgentRegistry
 

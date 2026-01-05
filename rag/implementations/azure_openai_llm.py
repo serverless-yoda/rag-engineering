@@ -82,7 +82,14 @@ class AzureOpenAILLM(LLMProvider):
         wait=wait_exponential(multiplier=1, min=2, max=10),
         retry=retry_if_exception_type(Exception),
     )
-    async def safe_generate(self, messages, temperature=0.7, max_tokens=None):
+    async def generate_with_retry(self, messages, temperature=0.7, max_tokens=None):
+        """
+        Safe generate method with retry logic.
+        :param self: Description
+        :param messages: Description
+        :param temperature: Description
+        :param max_tokens: Description
+        """
         return await self.client.chat.completions.create(
             model=self.deployment_name,
             messages=messages,

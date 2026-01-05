@@ -22,10 +22,10 @@ from ..utils import (
     chunk_text,
     chunk_text_tiktoken,
     batched,
-    make_search_documents,
+    create_search_documents,
     now_iso,
     ensure_namespace,
-    normalize_items,
+    normalize_text_items,
     normalize_file_items,
     file_to_text_content,
     make_item_source_id,
@@ -111,14 +111,14 @@ class DocumentIngester:
                         chunk_embeddings = await self.embedder.embed(chunk_batch)
                         embeddings.extend(chunk_embeddings)
                     
-                    docs = make_search_documents(
+                    docs = create_search_documents(
                         namespace=namespace,
                         source_id=make_item_source_id(item, total_processed, "streaming"),
                         content_chunks=chunks,
                         embeddings=embeddings,
                     )
                     
-                    uploaded = await self.store.upsert_documents(docs)
+                    uploaded = await self.store.save_documents(docs)
                     total_uploaded += uploaded
                     total_chunks += len(chunks)
                     
@@ -155,7 +155,7 @@ class DocumentIngester:
         2. NORMALIZE: Converts each item to clean text using to_text_content()
         3. CHUNK: Splits text into chunks based on chunking_config
         4. EMBED: Generates embeddings in batches for efficiency
-        5. SHAPE: Creates search-ready documents with make_search_documents()
+        5. SHAPE: Creates search-ready documents with create_search_documents()
         6. STORE: Uploads documents to vector store
         
         Args:
@@ -196,7 +196,6 @@ class DocumentIngester:
         chunk_map: List[int] = []  # Number of chunks per document (for later document reconstruction)
         normalized: List[str] = []  # Normalized text for each document
         
-        # items = normalize_items(items)
         normalized_items = normalize_file_items(items)
         
         for item in normalized_items:
@@ -325,7 +324,7 @@ class DocumentIngester:
             # Create search documents using the utility function
             # This handles formatting, metadata, timestamps, etc.
             docs.extend(
-                make_search_documents(
+                create_search_documents(
                     namespace=namespace,
                     source_id=item_source_id,
                     content_chunks=these_chunks,
@@ -349,7 +348,7 @@ class DocumentIngester:
                 
             # Upload all documents to the vector store
             # Uses the VectorStoreProvider interface (e.g., AzureSearchStore)
-            uploaded_count = await self.store.upsert_documents(docs)
+            uploaded_count = await self.store.save_documents(docs)
             
         except Exception as e:
             # Upload failed - return error with partial progress
@@ -431,7 +430,7 @@ class DocumentIngester:
 
         try:
             if docs:
-                uploaded = await self.store.upsert_documents(docs)
+                uploaded = await self.store.save_documents(docs)
         finally:
              pass
 

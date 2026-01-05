@@ -96,7 +96,7 @@ class IndexManager:
         """
         Create an Azure AI Search index with vector search capabilities.
         
-        The index schema matches the document format produced by make_search_documents():
+        The index schema matches the document format produced by create_search_documents():
         - id: Unique key (String, filterable, sortable)
         - namespace: Logical grouping (String, filterable, facetable, sortable)
         - source_id: Source document ID (String, filterable, sortable)

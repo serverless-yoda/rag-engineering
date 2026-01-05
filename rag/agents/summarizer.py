@@ -9,7 +9,7 @@ This agent uses the LLM to:
 - Extract and distill key information from the input text
 - Return a focused, goal-aligned summary
 """
-from ..agents.base_agents import BaseAgent
+from .base_agent import BaseAgent
 from ..models import AgentResponse
 from ..agents.registry import AgentRegistry
 
