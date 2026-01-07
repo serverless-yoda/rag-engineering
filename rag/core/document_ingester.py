@@ -14,8 +14,8 @@ import logging
 import time
 import json
 from typing import List, Union, Dict, Any, Optional
-from ..abstractions.embedding_provider import EmbeddingProvider
-from ..abstractions.vector_store_provider import VectorStoreProvider
+from ..interfaces import EmbeddingProvider
+from ..interfaces import VectorStoreProvider
 from ..models.types import IngestionResult, ChunkingConfig, JsonDict
 from ..utils import (
     to_text_content,
@@ -199,14 +199,9 @@ class DocumentIngester:
         normalized_items = normalize_file_items(items)
         
         for item in normalized_items:
-            # print(f"Processing item: {item}")
-
             # Convert arbitrary input (str, dict, bytes, etc.) to clean text
-            # Uses to_text_content() which handles HTML stripping, JSON encoding, etc.
-            
-            #text = to_text_content(item)
+            # Uses to_text_content() which handles HTML stripping, JSON encoding, etc.            
             text = file_to_text_content(item)
-            #print(f"Extracted text: {text[:100]}...")
             normalized.append(text)
             
             # Split text into chunks based on configuration

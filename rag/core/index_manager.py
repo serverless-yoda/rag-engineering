@@ -252,6 +252,8 @@ class IndexManager:
         await self.client.delete_index(self.index_name)
         logging.info(f"Index '{self.index_name}' deleted successfully")
     
+    
+
     async def close(self) -> None:
         """
         Close the Azure AI Search index client.

@@ -3,7 +3,7 @@
 """Tracking decorators for monitoring function execution."""
 
 from typing import List
-from ..abstractions import EmbeddingProvider, EmbeddingMatrix
+from ..interfaces import EmbeddingProvider, EmbeddingMatrix
 from ..utils import TokenTracker
 
 

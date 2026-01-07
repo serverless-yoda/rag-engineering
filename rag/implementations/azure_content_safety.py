@@ -50,10 +50,12 @@ class AzureContentSafety:
                 endpoint=endpoint,
                 credential=AzureKeyCredential(api_key),
             )
+            #print(f"{self.__class__.__name__} created with client session at {hex(id(self.client))}")
         else:
             self.client = None
             if enabled:
                 logging.warning("Content Safety credentials missing. Moderation disabled.")
+
     
     @retry(
         stop=stop_after_attempt(3),
@@ -136,10 +138,9 @@ class AzureContentSafety:
                     "recommendation": f"🚫 Blocked: Safety check failed ({e})",
                     "error": str(e),
                 }
-    
-    
+        
     # implementations/azure_content_safety.py
-    async def close(self) -> None:
+    async def __close(self) -> None:
         """
         Close the Azure Content Safety client connection.
         Safe to call multiple times.
@@ -148,9 +149,19 @@ class AzureContentSafety:
             if self.client:
                 await self.client.close()
                 logging.info(f"{self.__class__.__name__} client closed.")
-            else:
-                logging.debug("AzureContentSafety client is None — nothing to close.")
         except Exception as e:
-            logging.debug(f"Error closing Azure Content Safety: {e}")
+            logging.error(f"Error closing Azure Content Safety: {e}")
 
-    
+    async def close(self) -> None:
+        """
+        Close the Azure Content Safety client connection.
+        Safe to call multiple times.
+        """
+
+        try:
+            if hasattr(self, "client") and self.client:
+                if hasattr(self.client, "close") and callable(self.client.close):
+                    await self.client.close()
+        except Exception as e:
+            logging.error(f"Error closing Azure Content Safety: {e}")
+

@@ -10,8 +10,8 @@ returns normalized results with metadata.
 
 import logging
 from typing import List, Optional
-from ..abstractions.embedding_provider import EmbeddingProvider
-from ..abstractions.vector_store_provider import VectorStoreProvider
+from ..interfaces import EmbeddingProvider
+from ..interfaces import VectorStoreProvider
 from ..models.types import SearchResult
 from ..models import SearchError
 

@@ -12,7 +12,7 @@ from typing import List, Dict, Any, Optional
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents.aio import SearchClient
 from azure.search.documents.models import VectorizedQuery
-from ..abstractions.vector_store_provider import VectorStoreProvider
+from ..interfaces import VectorStoreProvider
 from ..core.vector_store_repository import VectorStoreRepository
 
 class AzureSearchStore(VectorStoreProvider):
@@ -65,6 +65,7 @@ class AzureSearchStore(VectorStoreProvider):
         
         # Initialize repository for data access
         self.repository = VectorStoreRepository(self.client)
+        print(f"{self.__class__.__name__} created with client session at {hex(id(self.client))}")
 
     async def save_documents(self, documents: List[Dict[str, Any]]) -> int:
         """Upload documents via repository."""

@@ -13,7 +13,7 @@ from typing import List, Dict, Optional
 from openai import AsyncAzureOpenAI
     
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-from ..abstractions.llm_provider import LLMProvider
+from ..interfaces import LLMProvider
 from ..utils import TokenTracker
 
 class AzureOpenAILLM(LLMProvider):
@@ -172,3 +172,4 @@ class AzureOpenAILLM(LLMProvider):
             logging.info(f"{self.__class__.__name__} client closed.")
         except Exception as e:
             logging.error(f"Error closing Azure OpenAI LLM: {e}")
+            

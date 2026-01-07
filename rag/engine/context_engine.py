@@ -89,9 +89,6 @@ class ContextEngine:
                 ))
 
                 print(f"Executed Step {step['step']} with agent {step['agent']}")
-                #print(f"Input: {mcp_input}")
-                #print(f"Output: {mcp_output}")
-
                 if mcp_output.status == "blocked":
                     logging.warning(f"⚠️ Workflow blocked at step {step['step']}")
                     return mcp_output.content

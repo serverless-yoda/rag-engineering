@@ -12,7 +12,7 @@ import json
 import re
 import logging
 from typing import List, Dict
-from ..abstractions.llm_provider import LLMProvider
+from ..interfaces import LLMProvider
 
 class PlannerAgent:
     """

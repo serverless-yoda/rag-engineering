@@ -1,4 +1,4 @@
-# abstractions/vector_store_provider.py
+# interfacess/vector_store_provider.py
 
 """
 Abstract interface for vector storage services.

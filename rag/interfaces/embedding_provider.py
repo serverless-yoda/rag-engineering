@@ -1,4 +1,4 @@
-# abstractions/embedding_provider.py
+# interfacess/embedding_provider.py
 
 """
 Abstract interface for embedding service providers.

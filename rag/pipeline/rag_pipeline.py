@@ -72,7 +72,8 @@ class RAGPipeline:
     
 
     async def __aexit__(self, exc_type, exc, tb):
-        logging.debug("RAGPipeline __aexit__ triggered")
+        #logging.debug("RAGPipeline __aexit__ triggered")
+        print("RAGPipeline __aexit__ triggered")
         await self.close()
 
     
@@ -84,7 +85,6 @@ class RAGPipeline:
                 logging.info(f"Closing {self.__class__.__name__} at {hex(id(self))}")
                 await client.close()
                 logging.info(f"Done closing {client.__class__.__name__}")
-                
             except Exception as e:
                 logging.error(f"Error closing {client.__class__.__name__}: {e}")
         

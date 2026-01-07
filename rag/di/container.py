@@ -5,7 +5,7 @@ Dependency injection container using dependency-injector.
 """
 
 from dependency_injector import containers, providers
-from ..models import RAGConfig
+#from ..models import RAGConfig
 from ..implementations import (
     AzureOpenAIEmbedder,
     AzureOpenAILLM,
@@ -30,14 +30,14 @@ class Container(containers.DeclarativeContainer):
     # Token tracker (singleton)
     token_tracker = providers.Singleton(TokenTracker)
 
-    embedder = providers.Factory(
+    embedder = providers.Singleton(
         TrackedEmbeddingProvider,
         embedder=providers.Factory(AzureOpenAIEmbedder, ...),
         tracker=token_tracker,
     )
 
     # Embedding provider
-    embedder = providers.Factory(
+    embedder = providers.Singleton(
         AzureOpenAIEmbedder,
         endpoint=config.azure_openai_endpoint,
         api_key=config.azure_openai_api_key,
@@ -47,7 +47,7 @@ class Container(containers.DeclarativeContainer):
     )
     
     # LLM provider
-    llm = providers.Factory(
+    llm = providers.Singleton(
         AzureOpenAILLM,
         endpoint=config.azure_openai_endpoint,
         api_key=config.azure_openai_api_key,
@@ -59,7 +59,7 @@ class Container(containers.DeclarativeContainer):
     )
     
     # Vector store provider
-    store = providers.Factory(
+    store = providers.Singleton(
         AzureSearchStore,
         endpoint=config.azure_search_endpoint,
         api_key=config.azure_search_api_key,
@@ -67,7 +67,7 @@ class Container(containers.DeclarativeContainer):
     )
     
     # Index manager
-    index_manager = providers.Factory(
+    index_manager = providers.Singleton(
         IndexManager,
         endpoint=config.azure_search_endpoint,
         api_key=config.azure_search_api_key,
@@ -76,7 +76,7 @@ class Container(containers.DeclarativeContainer):
     )
     
     # Content safety (optional)
-    content_safety = providers.Factory(
+    content_safety = providers.Singleton(
         AzureContentSafety,
         endpoint=config.content_safety_endpoint,
         api_key=config.content_safety_api_key,
@@ -85,7 +85,7 @@ class Container(containers.DeclarativeContainer):
     )
     
     # Document ingester
-    ingester = providers.Factory(
+    ingester = providers.Singleton(
         DocumentIngester,
         embedder=embedder,
         store=store,
@@ -94,7 +94,7 @@ class Container(containers.DeclarativeContainer):
     )
     
     # Semantic searcher
-    searcher = providers.Factory(
+    searcher = providers.Singleton(
         SemanticSearcher,
         embedder=embedder,
         store=store,
@@ -102,12 +102,12 @@ class Container(containers.DeclarativeContainer):
     )
     
     # Answer generator
-    generator = providers.Factory(
+    generator = providers.Singleton(
         AnswerGenerator,
         llm=llm,
     )
 
-    rag_pipeline = providers.Factory(
+    rag_pipeline = providers.Singleton(
         RAGPipeline,
         config=config,
         embedder=embedder,

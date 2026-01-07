@@ -11,7 +11,7 @@ import logging
 from typing import List, Optional
 from openai import AsyncAzureOpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-from ..abstractions.embedding_provider import EmbeddingProvider, EmbeddingMatrix
+from ..interfaces import EmbeddingProvider, EmbeddingMatrix
 from ..utils import TokenTracker
 
 
@@ -66,7 +66,6 @@ class AzureOpenAIEmbedder(EmbeddingProvider):
             azure_endpoint=endpoint,
             timeout=timeout,
         )
-    
     
     @retry(
         stop=stop_after_attempt(3),
@@ -132,5 +131,4 @@ class AzureOpenAIEmbedder(EmbeddingProvider):
             await self.client.close()
             logging.info(f"{self.__class__.__name__} client closed.")
         except Exception as e:
-            # Log but don't raise - cleanup should be silent
             logging.error(f"Error closing Azure OpenAI embedder: {e}")

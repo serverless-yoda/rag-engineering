@@ -10,7 +10,7 @@ interface with Azure OpenAI or other LLM services.
 
 import logging
 from typing import List, Optional
-from ..abstractions.llm_provider import LLMProvider
+from ..interfaces import LLMProvider
 from ..models import GenerationError
 
 class AnswerGenerator:
