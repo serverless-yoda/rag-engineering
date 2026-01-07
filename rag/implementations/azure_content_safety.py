@@ -147,6 +147,7 @@ class AzureContentSafety:
         try:
             if self.client:
                 await self.client.close()
+                logging.info(f"{self.__class__.__name__} client closed.")
             else:
                 logging.debug("AzureContentSafety client is None — nothing to close.")
         except Exception as e:

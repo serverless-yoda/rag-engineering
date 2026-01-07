@@ -130,6 +130,7 @@ class AzureOpenAIEmbedder(EmbeddingProvider):
         """
         try:
             await self.client.close()
+            logging.info(f"{self.__class__.__name__} client closed.")
         except Exception as e:
             # Log but don't raise - cleanup should be silent
             logging.error(f"Error closing Azure OpenAI embedder: {e}")

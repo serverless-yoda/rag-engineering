@@ -9,6 +9,7 @@ This agent uses the LLM to produce structured output based on:
 - previous_content: optional existing content to rewrite
 """
 
+import logging
 from .base_agent import BaseAgent
 from ..models import AgentResponse
 from ..agents.registry import AgentRegistry
@@ -25,6 +26,16 @@ class WriterAgent(BaseAgent):
         """
         self.generator = generator
         self.content_safety = content_safety
+
+    async def setup(self):
+        logging.info(f"[{self.__class__.__name__}] Setup started.")
+        # Add any initialization logic here
+        logging.info(f"[{self.__class__.__name__}] Setup completed.")
+
+    async def teardown(self):
+        logging.info(f"[{self.__class__.__name__}] Teardown started.")
+        # Add any cleanup logic here
+        logging.info(f"[{self.__class__.__name__}] Teardown completed.")
 
     async def execute(self, mcp_message):
         """

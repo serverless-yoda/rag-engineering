@@ -10,6 +10,7 @@ to synthesize the plan in JSON format.
 
 import json
 import re
+import logging
 from typing import List, Dict
 from ..abstractions.llm_provider import LLMProvider
 
@@ -32,6 +33,19 @@ class PlannerAgent:
 
     def __init__(self, generator):
         self.generator = generator
+
+
+
+    async def setup(self):
+        logging.info(f"[{self.__class__.__name__}] Setup started.")
+        # Add any initialization logic here
+        logging.info(f"[{self.__class__.__name__}] Setup completed.")
+
+    async def teardown(self):
+        logging.info(f"[{self.__class__.__name__}] Teardown started.")
+        # Add any cleanup logic here
+        logging.info(f"[{self.__class__.__name__}] Teardown completed.")
+
 
     def _extract_json_from_response(self, response: str) -> dict:
         """Extract JSON from LLM response, handling markdown fences."""

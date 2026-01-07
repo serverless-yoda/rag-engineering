@@ -70,18 +70,22 @@ class RAGPipeline:
     async def __aenter__(self) -> "RAGPipeline":
         return self
     
-    async def __aexit__(self, exc_type, exc, tb) -> None:
+
+    async def __aexit__(self, exc_type, exc, tb):
+        logging.debug("RAGPipeline __aexit__ triggered")
         await self.close()
+
     
     async def close(self) -> None:
         """Clean up resources."""
+        logging.debug("Starting pipeline.close() cleanup")
         for client in [self.embedder, self.store, self.llm, self.index_manager]:
             try:
                 logging.info(f"Closing {self.__class__.__name__} at {hex(id(self))}")
                 await client.close()
                 logging.info(f"Done closing {client.__class__.__name__}")
                 
-            except Exception:
+            except Exception as e:
                 logging.error(f"Error closing {client.__class__.__name__}: {e}")
         
         if self.content_safety:

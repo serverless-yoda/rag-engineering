@@ -9,6 +9,8 @@ This agent uses the LLM to:
 - Extract and distill key information from the input text
 - Return a focused, goal-aligned summary
 """
+
+import logging
 from .base_agent import BaseAgent
 from ..models import AgentResponse
 from ..agents.registry import AgentRegistry
@@ -26,6 +28,16 @@ class SummarizerAgent(BaseAgent):
         The pipeline provides access to the LLM and other shared services.
         """
         self.generator = generator
+
+    async def setup(self):
+        logging.info(f"[{self.__class__.__name__}] Setup started.")
+        # Add any initialization logic here
+        logging.info(f"[{self.__class__.__name__}] Setup completed.")
+
+    async def teardown(self):
+        logging.info(f"[{self.__class__.__name__}] Teardown started.")
+        # Add any cleanup logic here
+        logging.info(f"[{self.__class__.__name__}] Teardown completed.")
 
     async def execute(self, mcp_message):
         """

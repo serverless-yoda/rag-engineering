@@ -2,6 +2,7 @@
 
 """Librarian agent: Retrieves semantic blueprints."""
 import json
+import logging
 from .base_agent import BaseAgent
 from ..models import AgentResponse
 from ..agents.registry import AgentRegistry
@@ -15,7 +16,18 @@ from ..agents.registry import AgentRegistry
 class LibrarianAgent(BaseAgent):
     def __init__(self, searcher):
         self.searcher = searcher
-    
+
+
+    async def setup(self):
+        logging.info(f"[{self.__class__.__name__}] Setup started.")
+        # Add any initialization logic here
+        logging.info(f"[{self.__class__.__name__}] Setup completed.")
+
+    async def teardown(self):
+        logging.info(f"[{self.__class__.__name__}] Teardown started.")
+        # Add any cleanup logic here
+        logging.info(f"[{self.__class__.__name__}] Teardown completed.")
+ 
     async def execute(self, mcp_message):
         self.validate_input(mcp_message['content'], ['intent'])
 

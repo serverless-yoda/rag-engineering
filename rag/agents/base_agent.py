@@ -23,6 +23,10 @@ class BaseAgent(ABC):
                 raise ValueError(f"Missing required field: {field}")
             
     
+    async def setup(self):
+        """Optional setup hook called before execution begins."""
+        pass
+
     async def teardown(self):
         """Called on shutdown or context exit"""
         pass

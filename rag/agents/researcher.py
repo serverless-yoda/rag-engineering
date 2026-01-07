@@ -7,6 +7,7 @@ This agent performs semantic search over the 'KnowledgeStore' namespace
 and uses the LLM to summarize the retrieved chunks into concise facts.
 """
 
+import logging
 from ..utils import sanitize_input
 from .base_agent import BaseAgent
 from ..interfaces import SearchProvider, GenerationProvider
@@ -26,6 +27,16 @@ class ResearcherAgent(BaseAgent):
         self.searcher = searcher
         self.generator = generator
 
+
+    async def setup(self):
+        logging.info(f"[{self.__class__.__name__}] Setup started.")
+        # Add any initialization logic here
+        logging.info(f"[{self.__class__.__name__}] Setup completed.")
+
+    async def teardown(self):
+        logging.info(f"[{self.__class__.__name__}] Teardown started.")
+        # Add any cleanup logic here
+        logging.info(f"[{self.__class__.__name__}] Teardown completed.")
 
     async def execute(self, mcp_message):
         """
