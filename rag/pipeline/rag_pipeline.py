@@ -73,7 +73,7 @@ class RAGPipeline:
 
     async def __aexit__(self, exc_type, exc, tb):
         #logging.debug("RAGPipeline __aexit__ triggered")
-        print("RAGPipeline __aexit__ triggered")
+        #print("RAGPipeline __aexit__ triggered")
         await self.close()
 
     

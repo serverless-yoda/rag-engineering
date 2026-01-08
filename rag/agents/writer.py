@@ -37,6 +37,32 @@ class WriterAgent(BaseAgent):
         # Add any cleanup logic here
         logging.info(f"[{self.__class__.__name__}] Teardown completed.")
 
+
+    def _build_prompts(self, blueprint_json_string, facts_data, previous):
+        source_material = facts_data if facts_data else previous
+        source_label = "SOURCE FACTS" if facts_data else "PREVIOUS CONTENT (For Rewriting)"
+
+        system_prompt = f"""You are an expert content generation AI.
+Your task is to generate content based on the provided RESEARCH FINDINGS.
+Crucially, you MUST structure, style, and constrain your output according to the rules defined in the SEMANTIC BLUEPRINT provided below.
+
+--- SEMANTIC BLUEPRINT (JSON) ---
+{blueprint_json_string}
+--- END SEMANTIC BLUEPRINT ---
+
+Adhere strictly to the blueprint's instructions, style guides, and goals. The blueprint defines HOW you write; the research defines WHAT you write about.
+"""
+
+        user_prompt = f"""
+--- SOURCE MATERIAL ({source_label}) ---\n{source_material}\n--- END SOURCE MATERIAL ---        
+--- RESEARCH FINDINGS ---\n{facts_data}\n--- END RESEARCH FINDINGS ---\n
+{f"--- PREVIOUS CONTENT ---{previous}--- END PREVIOUS CONTENT ---" if previous else ""}
+Generate the content now.
+"""
+
+        return system_prompt, user_prompt
+
+
     async def execute(self, mcp_message):
         """
         Execute the writer agent.
@@ -73,28 +99,30 @@ class WriterAgent(BaseAgent):
             source_material = previous
             source_label = "PREVIOUS CONTENT (For Rewriting)"
 
-        system_prompt = f"""You are an expert content generation AI.
-Your task is to generate content based on the provided RESEARCH FINDINGS.
-Crucially, you MUST structure, style, and constrain your output according to the rules defined in the SEMANTIC BLUEPRINT provided below.
 
---- SEMANTIC BLUEPRINT (JSON) ---
-{blueprint_json}
---- END SEMANTIC BLUEPRINT ---
+#         system_prompt = f"""You are an expert content generation AI.
+# Your task is to generate content based on the provided RESEARCH FINDINGS.
+# Crucially, you MUST structure, style, and constrain your output according to the rules defined in the SEMANTIC BLUEPRINT provided below.
 
-Adhere strictly to the blueprint's instructions, style guides, and goals. The blueprint defines HOW you write; the research defines WHAT you write about.
-"""
+# --- SEMANTIC BLUEPRINT (JSON) ---
+# {blueprint_json}
+# --- END SEMANTIC BLUEPRINT ---
 
-        user_prompt = f"""
---- SOURCE MATERIAL ({source_label}) ---\n{source_material}\n--- END SOURCE MATERIAL ---        
---- RESEARCH FINDINGS ---
-{facts}
---- END RESEARCH FINDINGS ---
+# Adhere strictly to the blueprint's instructions, style guides, and goals. The blueprint defines HOW you write; the research defines WHAT you write about.
+# """
 
-{f"--- PREVIOUS CONTENT ---{previous}--- END PREVIOUS CONTENT ---" if previous else ""}
+#         user_prompt = f"""
+# --- SOURCE MATERIAL ({source_label}) ---\n{source_material}\n--- END SOURCE MATERIAL ---        
+# --- RESEARCH FINDINGS ---
+# {facts}
+# --- END RESEARCH FINDINGS ---
 
-Generate the content now.
-"""
-        
+# {f"--- PREVIOUS CONTENT ---{previous}--- END PREVIOUS CONTENT ---" if previous else ""}
+
+# Generate the content now.
+# """
+
+        system_prompt, user_prompt = self._build_prompts(blueprint_json_string, facts_data, previous)        
         try:
 
             final_output = await self.generator.generate(question=user_prompt, context="", system_prompt=system_prompt)
