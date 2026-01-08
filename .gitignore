@@ -44,13 +44,14 @@ next-env.d.ts
 /blueprints
 /foundry-poc
 /other-poc
+/n8n
 
 # remove cache files
 **/__pycache__/
 *.pyc
 *.txt
+!planner_prompt.txt
 
 # exclude temporary python files
-**/temp*.py
 **/temp*.py
 

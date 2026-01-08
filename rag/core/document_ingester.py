@@ -13,6 +13,7 @@ This module handles the complete ingestion workflow:
 import logging
 import time
 import json
+from pathlib import Path
 from typing import List, Union, Dict, Any, Optional
 from ..interfaces import EmbeddingProvider
 from ..interfaces import VectorStoreProvider

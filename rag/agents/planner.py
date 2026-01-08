@@ -11,8 +11,10 @@ to synthesize the plan in JSON format.
 import json
 import re
 import logging
+from pathlib import Path
 from typing import List, Dict
 from ..interfaces import LLMProvider
+
 
 class PlannerAgent:
     """
@@ -26,15 +28,25 @@ class PlannerAgent:
     Example output:
     [
         {"step": 1, "agent": "Librarian", "input": {"intent": "suspenseful narrative blueprint"}},
-        {"step": 2, "agent": "Researcher", "input": {"topic": "Apollo 11"}},
+        {"step": 2, "agent": "Researcher", "input": {"topic": "Titanic Sinking"}},
         {"step": 3, "agent": "Writer", "input": {"blueprint": "STEP_1_OUTPUT", "facts": "STEP_2_OUTPUT"}}
     ]
     """
 
-    def __init__(self, generator):
+    def __init__(self, generator,  prompt_path: str = "rag/prompts/planner_prompt.txt"):
         self.generator = generator
-
-
+        self.prompt_path = Path(prompt_path)
+    
+    def _load_prompt_template(self, capabilities: str) -> str:
+        try:
+            # Resolve absolute path
+            resolved_path = self.prompt_path.resolve()
+            template = resolved_path.read_text(encoding="utf-8")
+            return template.replace("{capabilities}", capabilities)
+        except FileNotFoundError:
+            raise RuntimeError(f"Prompt file not found: {resolved_path}")
+        except Exception as e:
+            raise RuntimeError(f"Failed to load prompt: {e}")
 
     async def setup(self):
         logging.info(f"[{self.__class__.__name__}] Setup started.")
@@ -85,28 +97,7 @@ class PlannerAgent:
             ValueError if the LLM response is not a valid JSON list
         """
 
-        system_prompt = f"""
-        You are the strategic planner of a multi-agent AI system.
-        Your job is to break down the user's goal into a structured execution plan.
-
-        --- AVAILABLE AGENTS ---
-        {capabilities}
-        --- END AGENTS ---
-
-        INSTRUCTIONS:
-        - Return a JSON list of steps.
-        - Each step must include: step number, agent name, input dictionary.
-        - Use context chaining: reference previous outputs using STEP_X_OUTPUT.
-        - Do not include explanations or extra text.
-
-        Example goal: "Write a suspenseful story about Apollo 11"
-        Example plan:
-        [
-            {{"step": 1, "agent": "Librarian", "input": {{"intent": "suspenseful narrative blueprint"}}}},
-            {{"step": 2, "agent": "Researcher", "input": {{"topic": "Apollo 11"}}}},
-            {{"step": 3, "agent": "Writer", "input": {{"blueprint": "STEP_1_OUTPUT", "facts": "STEP_2_OUTPUT"}}}}
-        ]
-        """
+        system_prompt = self._load_prompt_template(capabilities)
 
         try:
             response = await self.generator.generate(
