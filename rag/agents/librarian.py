@@ -4,7 +4,7 @@
 import json
 import logging
 from .base_agent import BaseAgent
-from ..models import AgentResponse
+from ..models import AgentResponse, AgentExecutionError
 from ..agents.registry import AgentRegistry
 
 @AgentRegistry.register(
@@ -51,9 +51,10 @@ class LibrarianAgent(BaseAgent):
                     content={"content": content}
                 )
         except Exception as e:
-            return AgentResponse(
-                            sender="Librarian",
-                            content={},
-                            status="error",
-                            error_message=str(e)
-                        )
+            # return AgentResponse(
+            #                 sender="Librarian",
+            #                 content={},
+            #                 status="error",
+            #                 error_message=str(e)
+            #             )
+            raise AgentExecutionError(f"LibrarianAgent execution failed: {e}")

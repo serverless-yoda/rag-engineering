@@ -11,7 +11,7 @@ This agent uses the LLM to produce structured output based on:
 
 import logging
 from .base_agent import BaseAgent
-from ..models import AgentResponse
+from ..models import AgentResponse, AgentExecutionError
 from ..agents.registry import AgentRegistry
 
 @AgentRegistry.register(
@@ -99,29 +99,6 @@ Generate the content now.
             source_material = previous
             source_label = "PREVIOUS CONTENT (For Rewriting)"
 
-
-#         system_prompt = f"""You are an expert content generation AI.
-# Your task is to generate content based on the provided RESEARCH FINDINGS.
-# Crucially, you MUST structure, style, and constrain your output according to the rules defined in the SEMANTIC BLUEPRINT provided below.
-
-# --- SEMANTIC BLUEPRINT (JSON) ---
-# {blueprint_json}
-# --- END SEMANTIC BLUEPRINT ---
-
-# Adhere strictly to the blueprint's instructions, style guides, and goals. The blueprint defines HOW you write; the research defines WHAT you write about.
-# """
-
-#         user_prompt = f"""
-# --- SOURCE MATERIAL ({source_label}) ---\n{source_material}\n--- END SOURCE MATERIAL ---        
-# --- RESEARCH FINDINGS ---
-# {facts}
-# --- END RESEARCH FINDINGS ---
-
-# {f"--- PREVIOUS CONTENT ---{previous}--- END PREVIOUS CONTENT ---" if previous else ""}
-
-# Generate the content now.
-# """
-
         system_prompt, user_prompt = self._build_prompts(blueprint_json_string, facts_data, previous)        
         try:
 
@@ -147,12 +124,11 @@ Generate the content now.
                     )
 
         except Exception as e:            
-            return AgentResponse(
-                            sender="Writer",
-                            content={},
-                            status="error",
-                            error_message=str(e)
-                        )
-        
-        
+            # return AgentResponse(
+            #                 sender="Writer",
+            #                 content={},
+            #                 status="error",
+            #                 error_message=str(e)
+            #             )
+            raise AgentExecutionError(f"WriterAgent execution failed:{e}")
 

@@ -12,7 +12,7 @@ This agent uses the LLM to:
 
 import logging
 from .base_agent import BaseAgent
-from ..models import AgentResponse
+from ..models import AgentResponse, AgentExecutionError
 from ..agents.registry import AgentRegistry
 
 @AgentRegistry.register(
@@ -87,9 +87,10 @@ class SummarizerAgent(BaseAgent):
             )
 
         except Exception as e:
-            return AgentResponse(
-                            sender="Summarizer",
-                            content={},
-                            status="error",
-                            error_message=str(e)
-                        )
+            # return AgentResponse(
+            #                 sender="Summarizer",
+            #                 content={},
+            #                 status="error",
+            #                 error_message=str(e)
+            #             )
+            raise AgentExecutionError(f"SummarizerAgent execution failed: {e}")

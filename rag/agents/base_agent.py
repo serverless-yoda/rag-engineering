@@ -4,7 +4,7 @@
 """Base abstraction for all agents."""
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
-from ..models import AgentResponse
+from ..models import AgentResponse, AgentExecutionError
 class BaseAgent(ABC):
     """Abstract base class for agents in the multi-agent system."""
     
@@ -36,7 +36,7 @@ class BaseAgent(ABC):
         """
         Error recovery hook. Return AgentResponse to continue, None to propagate error.
         """
-        return None
+        raise AgentExecutionError(f"{self.__class__.__name__} failed: {error}")
 
             
         
