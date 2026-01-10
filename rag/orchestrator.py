@@ -15,17 +15,14 @@ from .di.container import Container
 from .utils import list_files_in_folder
 from blueprints.knowledge.store import knowledge_data_raw
 from blueprints.context.instruction import context_blueprints
+from .models import setup_json_logging
 
+setup_json_logging("logs/pipeline.log")
 warnings.filterwarnings("ignore", category=RuntimeWarning, module="asyncio.proactor_events")
 
 logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
 logging.getLogger("azure.search.documents").setLevel(logging.WARNING)
 logging.getLogger("azure.core.pipeline").setLevel(logging.WARNING)
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
 
 async def main():
     # Step 1: Build configuration

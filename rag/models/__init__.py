@@ -16,6 +16,12 @@ from .types import (
     JsonDict,
 )
 from .execution_trace import ExecutionTrace
+from .log_config import (
+    request_id_ctx, 
+    agent_name_ctx, 
+    pipeline_stage_ctx,
+    setup_json_logging
+)
 
 __all__ = [
     "ChunkingConfig",
@@ -33,4 +39,8 @@ __all__ = [
     "PlanningError",
     "AgentExecutionError",
     "ExecutionTrace"
+    "request_id_ctx", 
+    "agent_name_ctx", 
+    "pipeline_stage_ctx"
+    "setup_json_logging"
 ]

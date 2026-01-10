@@ -65,7 +65,7 @@ class AzureSearchStore(VectorStoreProvider):
         
         # Initialize repository for data access
         self.repository = VectorStoreRepository(self.client)
-        print(f"{self.__class__.__name__} created with client session at {hex(id(self.client))}")
+        #print(f"{self.__class__.__name__} created with client session at {hex(id(self.client))}")
 
     async def save_documents(self, documents: List[Dict[str, Any]]) -> int:
         """Upload documents via repository."""

@@ -16,7 +16,7 @@ It provides high-level workflows and direct access to each stage.
 import logging
 from typing import List, Union, Dict, Any, Optional
 from ..models import RAGConfig, IngestionResult, SearchResult
-from ..utils import TokenTracker
+from ..utils import TokenTracker, with_logging_context
 from ..engine.context_engine import ContextEngine
 
 class RAGPipeline:
@@ -96,7 +96,7 @@ class RAGPipeline:
 
     
     # === High-Level Workflows ===
-    
+    @with_logging_context(stage="setup", agent="DocumentIngester")
     async def setup(
         self,
         documents: List[Union[str, Dict[str, Any]]],
@@ -110,6 +110,7 @@ class RAGPipeline:
             chunking_config=self.config.chunking,
         )
     
+    @with_logging_context(stage="search+answer", agent="AnswerGenerator")
     async def answer_question(
         self,
         question: str,
@@ -137,18 +138,12 @@ class RAGPipeline:
             context=context,
             system_prompt=system_prompt,
         )
-        
-        # Log token usage
-        #logging.info(self.token_tracker.report())
-        
         return answer
     
+    @with_logging_context(stage="multi-agent", agent="PlannerAgent")
     async def generate_with_context(self, goal: str) -> str:
         """Multi-agent workflow."""
         result = await self.context_engine.execute(goal)
-        
-        # Log token usage
-        #logging.info(self.token_tracker.report())
         
         return result
     

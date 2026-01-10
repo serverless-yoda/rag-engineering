@@ -17,6 +17,7 @@ from .normalize_utils import normalize_file_items
 from .generictext_utils import file_to_text_content
 from .tokens_utils import TokenTracker, TokenUsage
 from .tracking_decorators import TrackedEmbeddingProvider
+from .logging_decorators import with_logging_context
 
 __all__ = [
     "to_text_content",
@@ -36,5 +37,6 @@ __all__ = [
     "make_item_source_id",
     "TokenTracker",
     "TokenUsage",
-    "TrackedEmbeddingProvider"
+    "TrackedEmbeddingProvider",
+    "with_logging_context",
 ]
