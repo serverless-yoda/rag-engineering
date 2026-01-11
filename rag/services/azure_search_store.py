@@ -1,4 +1,4 @@
-# implementation/azure_search_store.py
+# services/azure_search_store.py
 
 """
 Azure AI Search vector store provider implementation.

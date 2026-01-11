@@ -139,7 +139,7 @@ class AzureContentSafety:
                     "error": str(e),
                 }
         
-    # implementations/azure_content_safety.py
+    
     async def __close(self) -> None:
         """
         Close the Azure Content Safety client connection.

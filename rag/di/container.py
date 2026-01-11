@@ -5,8 +5,7 @@ Dependency injection container using dependency-injector.
 """
 
 from dependency_injector import containers, providers
-#from ..models import RAGConfig
-from ..implementations import (
+from ..services import (
     AzureOpenAIEmbedder,
     AzureOpenAILLM,
     AzureSearchStore,
