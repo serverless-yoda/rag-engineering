@@ -17,7 +17,7 @@ import logging
 from typing import List, Union, Dict, Any, Optional
 from ..models import RAGConfig, IngestionResult, SearchResult
 from ..utils import TokenTracker, with_logging_context
-from ..engine.context_engine import ContextEngine
+from .context_engine import ContextEngine
 
 class RAGPipeline:
     """
