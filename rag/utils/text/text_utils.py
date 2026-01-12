@@ -1,4 +1,4 @@
-# utils/text_utils.py
+# utils/text/text_utils.py
 
 """
 Text normalization and HTML processing utilities.
