@@ -19,9 +19,8 @@ from ..interfaces import EmbeddingProvider
 from ..interfaces import VectorStoreProvider
 from ..models.types import IngestionResult, ChunkingConfig, JsonDict
 from ..utils.text import sanitize_input, strip_html, to_text_content
-
+from ..utils.token import normalize_file_items
 from ..utils import (
-    #to_text_content,
     chunk_text,
     chunk_text_tiktoken,
     batched,
@@ -29,10 +28,8 @@ from ..utils import (
     now_iso,
     ensure_namespace,
     normalize_text_items,
-    normalize_file_items,
     file_to_text_content,
     make_item_source_id,
-    #sanitize_input
 )
 
 

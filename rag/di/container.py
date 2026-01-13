@@ -18,7 +18,9 @@ from ..core import (
     SemanticSearcher,
     AnswerGenerator,
 )
-from ..utils import TokenTracker, TrackedEmbeddingProvider
+from ..utils import TokenTracker
+from ..utils.token import TrackedEmbeddingProvider
+
 from ..pipeline.rag_pipeline import RAGPipeline
 
 class Container(containers.DeclarativeContainer):

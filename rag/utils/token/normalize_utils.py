@@ -1,4 +1,4 @@
-# utils/normalize_utils.py
+# utils/token/normalize_utils.py
 
 """
 Utilities to normalize various input types (paths, bytes, dicts, file-like objects)

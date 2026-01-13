@@ -1,10 +1,10 @@
-# utils/tracking_decorators.py
+# utils/token/tracking_decorators.py
 
 """Tracking decorators for monitoring function execution."""
 
 from typing import List
-from ..interfaces import EmbeddingProvider, EmbeddingMatrix
-from ..utils import TokenTracker
+from ...interfaces import EmbeddingProvider, EmbeddingMatrix
+from .. import TokenTracker
 
 
 class TrackedEmbeddingProvider(EmbeddingProvider):
