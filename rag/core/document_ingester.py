@@ -20,18 +20,22 @@ from ..interfaces import VectorStoreProvider
 from ..models.types import IngestionResult, ChunkingConfig, JsonDict
 from ..utils.text import sanitize_input, strip_html, to_text_content
 from ..utils.token import normalize_file_items
+
 from ..utils import (
     chunk_text,
     chunk_text_tiktoken,
     batched,
-    create_search_documents,
-    now_iso,
-    ensure_namespace,
-    normalize_text_items,
-    file_to_text_content,
-    make_item_source_id,
-)
+    )
 
+from ..utils.file import (
+    create_search_documents,
+    normalize_text_items,
+    list_files_in_folder,
+    make_item_source_id,
+    file_to_text_content,
+    ensure_namespace,
+    now_iso
+)
 
 class DocumentIngester:
     """

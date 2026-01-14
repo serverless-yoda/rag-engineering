@@ -12,7 +12,7 @@ import sys
 from .models import env_settings
 from .models.config import RAGConfig, ChunkingConfig
 from .di.container import Container
-from .utils import list_files_in_folder
+from .utils.file import list_files_in_folder
 from blueprints.knowledge.store import knowledge_data_raw
 from blueprints.context.instruction import context_blueprints
 from .models import setup_json_logging

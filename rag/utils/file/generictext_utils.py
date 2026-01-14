@@ -1,4 +1,4 @@
-# utils/generictext_utils.py
+# utils/file/generictext_utils.py
 
 """
 Generic text extraction utilities for various file types.
