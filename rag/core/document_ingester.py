@@ -21,7 +21,7 @@ from ..models.types import IngestionResult, ChunkingConfig, JsonDict
 from ..utils.text import sanitize_input, strip_html, to_text_content
 from ..utils.token import normalize_file_items
 
-from ..utils import (
+from ..utils.chunk import (
     chunk_text,
     chunk_text_tiktoken,
     batched,

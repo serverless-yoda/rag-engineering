@@ -1,4 +1,4 @@
-# utils/chunking_utils.py
+# utils/chunk/chunking_utils.py
 
 """
 Text chunking utilities for document ingestion.

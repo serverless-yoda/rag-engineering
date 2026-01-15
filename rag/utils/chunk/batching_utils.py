@@ -1,4 +1,4 @@
-# utils/batching.py
+# utils/chunk/batching.py
 
 """
 Batching utility for processing sequences in chunks.

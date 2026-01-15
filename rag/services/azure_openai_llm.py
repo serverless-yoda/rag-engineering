@@ -14,7 +14,7 @@ from openai import AsyncAzureOpenAI
     
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from ..interfaces import LLMProvider
-from ..utils import TokenTracker
+from ..utils.chunk import TokenTracker
 
 class AzureOpenAILLM(LLMProvider):
     """

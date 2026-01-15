@@ -4,7 +4,7 @@
 
 from typing import List
 from ...interfaces import EmbeddingProvider, EmbeddingMatrix
-from .. import TokenTracker
+from ..chunk import TokenTracker
 
 
 class TrackedEmbeddingProvider(EmbeddingProvider):

@@ -16,7 +16,8 @@ It provides high-level workflows and direct access to each stage.
 import logging
 from typing import List, Union, Dict, Any, Optional
 from ..models import RAGConfig, IngestionResult, SearchResult
-from ..utils import TokenTracker, with_logging_context
+from ..utils.chunk import TokenTracker
+from ..utils import  with_logging_context
 from .context_engine import ContextEngine
 
 class RAGPipeline:
