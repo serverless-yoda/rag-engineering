@@ -4,7 +4,7 @@
 import functools
 import uuid
 import logging
-from ..models  import request_id_ctx, agent_name_ctx, pipeline_stage_ctx
+from ...models  import request_id_ctx, agent_name_ctx, pipeline_stage_ctx
 
 def with_logging_context(stage: str, agent: str = None):
     def decorator(func):
