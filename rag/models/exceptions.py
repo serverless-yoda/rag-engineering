@@ -1,5 +1,5 @@
-
 # models/exceptions.py
+
 """Custom exceptions for the RAG pipeline."""
 
 class PipelineError(Exception):

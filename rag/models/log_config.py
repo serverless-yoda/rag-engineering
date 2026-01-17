@@ -1,5 +1,5 @@
 
-# log_config.py
+# models/log_config.py
 
 import logging
 import json

@@ -1,4 +1,5 @@
 # models/agent_response.py
+
 """Data model for agent responses in the RAG system."""
 
 from dataclasses import dataclass

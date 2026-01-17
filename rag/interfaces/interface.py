@@ -1,4 +1,5 @@
 # interfaces/interface.py
+
 """Base interface for RAG components."""
 from typing import Protocol, List, Dict, Optional
 from ..models import SearchResult

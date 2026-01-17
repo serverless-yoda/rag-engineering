@@ -1,4 +1,4 @@
-# implementation/azure_openai_embedder.py
+# services/azure_openai_embedder.py
 
 """
 Azure OpenAI embedding provider implementation with token tracking and circuit breaker

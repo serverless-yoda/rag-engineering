@@ -1,3 +1,5 @@
+# interfaces/__init__.py
+
 from .interface import SearchProvider, GenerationProvider
 from .embedding_provider import EmbeddingProvider, EmbeddingMatrix
 from .llm_provider import LLMProvider
