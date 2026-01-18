@@ -45,6 +45,7 @@ next-env.d.ts
 /foundry-poc
 /other-poc
 /n8n
+/explanability
 
 # remove cache files
 **/__pycache__/

@@ -21,6 +21,11 @@ from azure.search.documents.indexes.models import (
     SimpleField,
     VectorSearch,
     VectorSearchProfile,
+    HnswParameters,
+    SemanticConfiguration,
+    SemanticPrioritizedFields,
+    SemanticField,
+    SemanticSearch
 )
 
 
@@ -213,9 +218,26 @@ class IndexManager:
         # for approximate nearest neighbor search in high-dimensional spaces
         vector_search = VectorSearch(
             # Define the algorithm configuration
-            algorithms=[
-                HnswAlgorithmConfiguration(name="myHnsw")
+            # algorithms=[
+            #     HnswAlgorithmConfiguration(name="myHnsw")
+            # ],
+
+            # Tune HNSW Parameters
+            # The default HNSW settings are usually fine, but for large datasets ($>100k$ chunks), you can tune the HnswParameters to balance indexing speed vs. search recall.
+
+            # Higher ef_construction = better accuracy but slower indexing
+            # Higher m = better for high-dimensional data but uses more memory
+            algorithms = [
+                HnswAlgorithmConfiguration(
+                    name="myHnsw",
+                    parameters=HnswParameters(
+                        m=4, 
+                        ef_construction=400, 
+                        metric="cosine"  # "cosine" is recommended for OpenAI embeddings
+                    )
+                )
             ],
+
             # Define the profile that links fields to algorithms
             profiles=[
                 VectorSearchProfile(
@@ -225,12 +247,28 @@ class IndexManager:
             ],
         )
         
+        # Add Semantic Ranking (L2 Re-ranking)
+        # For RAG applications, vector search alone sometimes misses nuances. Azure's Semantic Ranker uses a secondary LLM to re-score the top results from the vector search.
+        semantic_search = SemanticSearch(
+            configurations=[
+                SemanticConfiguration(
+                    name="my-semantic-config",
+                    prioritized_fields=SemanticPrioritizedFields(
+                        content_fields=[SemanticField(field_name="chunk")],
+                        keywords_fields=[SemanticField(field_name="tags")]
+                    )
+                )
+            ]
+        )
+
         # Create the index definition
         index = SearchIndex(
             name=self.index_name,
             fields=fields,
             vector_search=vector_search,
+            semantic_search=semantic_search
         )
+        
         
         # Create the index in Azure AI Search
         await self.client.create_index(index)
@@ -252,7 +290,11 @@ class IndexManager:
         await self.client.delete_index(self.index_name)
         logging.info(f"Index '{self.index_name}' deleted successfully")
     
-    
+    # Implement create_or_update_index
+    async def update_index(self, index_definition: SearchIndex) -> None:
+        """Updates the index schema without deleting existing data."""
+        await self.client.create_or_update_index(index_definition)
+        logging.info(f"Index '{self.index_name}' updated.")
 
     async def close(self) -> None:
         """
