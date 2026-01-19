@@ -11,6 +11,7 @@ from typing import List, Dict, Any, Optional
 from azure.search.documents.aio import SearchClient
 from azure.search.documents.models import VectorizedQuery
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from ..utils.chunk import batched
 
 class VectorStoreRepository:
     """
@@ -164,3 +165,16 @@ class VectorStoreRepository:
             logging.info(f"{self.__class__.__name__} client closed.")
         except Exception as e:
             logging.error(f"Error closing repository: {e}")
+
+    
+    async def save_documents_batched(self, documents: List[Dict[str, Any]], batch_size: int = 500) -> int:
+        """
+        Save documents in batches to avoid size limits.
+        Args:
+            documents: List of document dictionaries
+            batch_size: Number of documents per batch
+        """
+        total_succeeded = 0
+        for batch in batched(documents, batch_size):
+            total_succeeded += await self.save_documents(batch)
+        return total_succeeded
