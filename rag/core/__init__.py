@@ -1,4 +1,4 @@
-# core/__init__.py
+# rag/core/__init__.py
 
 """
 Core B.I.S.A. modules for the RAG system.

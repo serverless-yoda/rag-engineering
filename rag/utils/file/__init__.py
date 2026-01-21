@@ -1,4 +1,4 @@
-# utils/file/__init__.py
+# rag/utils/file/__init__.py
 
 from .metadata_utils import ensure_namespace, now_iso
 from .document_utils import create_search_documents, normalize_text_items, list_files_in_folder, make_item_source_id

@@ -1,4 +1,4 @@
-# models/__init__.py
+# rag/models/__init__.py
 
 """
 Models package for RAG system data structures.

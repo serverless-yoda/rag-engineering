@@ -1,4 +1,4 @@
-# utils/logging/__init__.py
+# rag/utils/logging/__init__.py
 
 """
 Utility functions for the RAG system (Facade pattern).

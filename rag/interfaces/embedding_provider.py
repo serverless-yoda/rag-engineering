@@ -1,4 +1,4 @@
-# interfacess/embedding_provider.py
+# rag/interfacess/embedding_provider.py
 
 """
 Abstract interface for embedding service providers.

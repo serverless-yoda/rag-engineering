@@ -1,5 +1,4 @@
-
-# agents/summarizer.py
+# rag/agents/summarizer.py
 
 """
 📝 SummarizerAgent: Condenses large bodies of text into concise summaries tailored to a specific objective.

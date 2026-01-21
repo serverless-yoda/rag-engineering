@@ -1,4 +1,4 @@
-# pipeline/context_engine.py
+# rag/pipeline/context_engine.py
 
 """Context Engine: Multi-agent orchestration with planning."""
 import copy

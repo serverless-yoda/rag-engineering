@@ -1,4 +1,4 @@
-# utils/file/documents_utils.py
+# rag/utils/file/documents_utils.py
 
 """
 Document utilities for creating search-ready documents.

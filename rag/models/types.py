@@ -1,4 +1,4 @@
-# models/types.py
+# rag/models/types.py
 
 """
 Type definitions and result models for the RAG system.

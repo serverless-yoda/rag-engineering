@@ -1,4 +1,4 @@
-# interfacess/llm_provider.py
+# rag/interfacess/llm_provider.py
 
 """
 Abstract interface for Large Language Model services.

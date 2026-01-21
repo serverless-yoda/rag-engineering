@@ -1,4 +1,4 @@
-# core/answer_generator.py
+# rag/core/answer_generator.py
 
 """
 💬 ANSWER stage: Generate responses using a Large Language Model (LLM).

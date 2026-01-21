@@ -1,4 +1,4 @@
-# agents/writer.py
+# rag/agents/writer.py
 
 """
 ✍️ WriterAgent: Generates content using a blueprint and factual input.

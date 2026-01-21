@@ -1,4 +1,4 @@
-# agents/registry.py
+# rag/agents/registry.py
 
 """
 🧭 AgentRegistry: Central registry for agent lookup and capability description.

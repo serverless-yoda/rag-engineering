@@ -1,4 +1,4 @@
-# utils/file/generictext_utils.py
+# rag/utils/file/generictext_utils.py
 
 """
 Generic text extraction utilities for various file types.

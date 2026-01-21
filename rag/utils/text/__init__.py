@@ -1,4 +1,4 @@
-# utils/text/__init__.py
+# rag/utils/text/__init__.py
 
 from .text_utils import to_text_content, strip_html, sanitize_input
 

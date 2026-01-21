@@ -1,5 +1,4 @@
-
-# agents/base_agent.py
+# rag/agents/base_agent.py
 
 """Base abstraction for all agents."""
 from abc import ABC, abstractmethod

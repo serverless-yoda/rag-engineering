@@ -1,4 +1,4 @@
-# pipeline/rag_pipeline.py
+# rag/pipeline/rag_pipeline.py
 
 """
 🎯 RAGPipeline: Orchestrator for the B.I.S.A. framework.

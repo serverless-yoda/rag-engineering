@@ -1,4 +1,4 @@
-# models/config.py
+# rag/models/config.py
 
 """
 Configuration models for the RAG system.

@@ -1,4 +1,4 @@
-# models/exceptions.py
+# rag/models/exceptions.py
 
 """Custom exceptions for the RAG pipeline."""
 

@@ -1,4 +1,4 @@
-# core/vector_store_repository.py
+# rag/core/vector_store_repository.py
 
 
 """

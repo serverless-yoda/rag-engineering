@@ -1,5 +1,4 @@
-
-# utils/logging/logging_decorators.py
+# rag/utils/logging/logging_decorators.py
 
 import functools
 import uuid

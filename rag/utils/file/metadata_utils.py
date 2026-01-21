@@ -1,4 +1,4 @@
-# utils/file/metadata_utils.py
+# rag/utils/file/metadata_utils.py
 
 """
 Metadata utilities for document management.

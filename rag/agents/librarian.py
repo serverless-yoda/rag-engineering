@@ -1,4 +1,4 @@
-# agents/librarian.py
+# rag/agents/librarian.py
 
 """Librarian agent: Retrieves semantic blueprints."""
 import json

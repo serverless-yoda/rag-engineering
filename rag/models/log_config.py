@@ -1,5 +1,4 @@
-
-# models/log_config.py
+# rag/models/log_config.py
 
 import logging
 import json

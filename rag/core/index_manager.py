@@ -1,4 +1,4 @@
-# core/index_manager.py
+# rag/core/index_manager.py
 
 """
 BUILD stage: Azure AI Search index lifecycle management.

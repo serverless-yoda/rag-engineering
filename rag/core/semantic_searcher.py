@@ -1,4 +1,4 @@
-# core/semantic_searcher.py
+# rag/core/semantic_searcher.py
 
 """
 🔍 SEARCH stage: Semantic vector search using embeddings.

@@ -1,4 +1,4 @@
-# agents/researcher.py
+# rag/agents/researcher.py
 
 """
 🔍 ResearcherAgent: Synthesizes factual information from the knowledge store.

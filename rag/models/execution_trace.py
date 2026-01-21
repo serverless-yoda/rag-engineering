@@ -1,4 +1,4 @@
-# models/execution_trace.py
+# rag/models/execution_trace.py
 
 """Data model for execution trace of agents in the RAG pipeline."""
 

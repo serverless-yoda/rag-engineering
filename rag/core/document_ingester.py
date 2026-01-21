@@ -1,4 +1,4 @@
-# core/document_ingester.py
+# rag/core/document_ingester.py
 
 """
 INGEST stage: Document processing and storage pipeline.

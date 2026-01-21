@@ -1,4 +1,4 @@
-# di/container.py
+# rag/di/container.py
 
 """
 Dependency injection container using dependency-injector.
