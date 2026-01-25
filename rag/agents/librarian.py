@@ -51,10 +51,4 @@ class LibrarianAgent(BaseAgent):
                     content={"content": content}
                 )
         except Exception as e:
-            # return AgentResponse(
-            #                 sender="Librarian",
-            #                 content={},
-            #                 status="error",
-            #                 error_message=str(e)
-            #             )
             raise AgentExecutionError(f"LibrarianAgent execution failed: {e}")
