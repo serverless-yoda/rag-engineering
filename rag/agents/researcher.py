@@ -78,11 +78,5 @@ class ResearcherAgent(BaseAgent):
                 content={"facts": facts}
             )
         except Exception as e:
-            # return AgentResponse(
-            #     sender="Researcher",
-            #     content={},
-            #     status="error",
-            #     error_message=str(e)
-            # )
             raise AgentExecutionError(f"ResearcherAgent execution failed:{e}")
 
