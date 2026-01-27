@@ -86,10 +86,4 @@ class SummarizerAgent(BaseAgent):
             )
 
         except Exception as e:
-            # return AgentResponse(
-            #                 sender="Summarizer",
-            #                 content={},
-            #                 status="error",
-            #                 error_message=str(e)
-            #             )
             raise AgentExecutionError(f"SummarizerAgent execution failed: {e}")
