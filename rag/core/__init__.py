@@ -14,11 +14,13 @@ from .index_manager import IndexManager
 from .document_ingester import DocumentIngester
 from .semantic_searcher import SemanticSearcher
 from .answer_generator import AnswerGenerator
+from .index_manager_adapter import IndexManagerAdapter
 
 __all__ = [
     "IndexManager",
     "DocumentIngester",
     "SemanticSearcher",
     "AnswerGenerator",
+    "IndexManagerAdapter",
 ]
 
