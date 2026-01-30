@@ -296,7 +296,7 @@ class DocumentIngester:
             # Build a valid, unique source id based on the corresponding normalized item
             item = normalized_items[idx]
             item_source_id = make_item_source_id(item, idx, base_source_id=source_id)
-            print(f"Document source_id: {item_source_id}")
+            #print(f"Document source_id: {item_source_id}")
 
             # Optional: enrich metadata per document with filename/path/mime
             per_doc_meta = dict(extra_meta or {})
@@ -343,7 +343,7 @@ class DocumentIngester:
                     "First doc sample: %s",
                     json.dumps(docs[0], ensure_ascii=False)[:600],
                 )
-                print(json.dumps(docs[0], ensure_ascii=False)[:600])
+                #print(json.dumps(docs[0], ensure_ascii=False)[:600])
                 
             # Upload all documents to the vector store
             # Uses the VectorStoreProvider interface (e.g., AzureSearchStore)
