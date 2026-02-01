@@ -72,3 +72,20 @@ class RAGConfig:
     content_moderation_enabled: bool = True
     content_moderation_threshold: int = 2
 
+
+    # NEW: Provider configuration
+    provider_stack: str = "azure"  # "azure" or "open"
+    chat_provider_type: str = "azure"  # "azure", "openrouter", "gemini"
+    openrouter_api_key: Optional[str] = None
+    openrouter_model: Optional[str] = None
+    gemini_api_key: Optional[str] = None
+    gemini_model: Optional[str] = None
+
+    # Vector backend selection
+    vector_backend: str = "azure"  # "azure" or "supabase"
+
+    # Supabase fields 
+    supabase_endpoint_url: str | None = None
+    supabase_service_role_key: str | None = None
+    supabase_table_name: str = "rag_vectors"
+    supabase_vector_dimension: int = 1536
