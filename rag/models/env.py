@@ -41,7 +41,7 @@ class Settings(BaseSettings):
         str,
         Field(
             min_length=5,
-            alias="azure_ai_searh_api_key",  # keep backward-compatible alias
+            alias="azure_ai_search_api_key",  # keep backward-compatible alias
             description="Azure AI Search admin key",
         ),
     ]
@@ -98,6 +98,29 @@ class Settings(BaseSettings):
         int,
         Field(default=2, ge=0, le=6, description="Content severity threshold (0-6)")
     ]
+
+    # NEW: Provider Selection
+    provide_stack: str = "open"  # "azure" or "open"
+    chat_provider_type: str = "openrouter"  # "azure", "openrouter", "gemini"
+    
+    # NEW: OpenRouter
+    openrouter_api_key: Annotated[str, Field(alias="openrouter_api_key", min_length=5)]
+    openrouter_model: Annotated[str, Field(default="google/gemini-2.5-pro-exp-03-25:free")]
+    
+    # NEW: Gemini Direct (backup)
+    gemini_api_key: Annotated[Optional[str], Field(default=None)]
+    gemini_model: Annotated[str, Field(default="gemini-2.0-flash")]
+
+    # NEW: Vector Backend Selection
+    vector_backend: Annotated[str, Field(default="azure")]
+    
+    # NEW: Supabase Configuration
+    supabase_endpoint_url: str
+    supabase_service_role_key: str
+    supabase_db_connection: str
+    supabase_table_name: str
+    supabase_vector_dimension: int
+    llm_provider: str  # Also add this one
 
     model_config = SettingsConfigDict(
         env_file=".env",
