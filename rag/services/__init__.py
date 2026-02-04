@@ -8,13 +8,19 @@ using Azure SDKs (Azure OpenAI and Azure AI Search).
 """
 
 
-from .azure_openai_embedder import AzureOpenAIEmbedder
-from .azure_search_store import AzureSearchStore
-from .azure_openai_llm import AzureOpenAILLM
-from .azure_content_safety import AzureContentSafety
+from .azure import AzureOpenAIEmbedder
+from .azure import AzureSearchStore
+from .azure import AzureOpenAILLM
+from .azure import AzureContentSafety
+from .openrouter import OpenRouterLLM, OpenRouterEmbedder
+from .supabase import SupabaseVectorStore
+
 __all__ = [
     "AzureOpenAIEmbedder",
     "AzureSearchStore",
     "AzureOpenAILLM",
-    "AzureContentSafety"
+    "AzureContentSafety",
+    "OpenRouterLLM",
+    "OpenRouterEmbedder",
+    "SupabaseVectorStore"
 ]
