@@ -1,4 +1,4 @@
-# services/gemini/__init__.py
+# rag/services/gemini/__init__.py
 
 """
 Docstring for rag.services.gemini

@@ -46,7 +46,7 @@ next-env.d.ts
 /other-poc
 /n8n
 /explanability
-
+/autogen
 # remove cache files
 **/__pycache__/
 *.pyc
